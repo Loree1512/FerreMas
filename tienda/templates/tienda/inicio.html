@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerreMas - Herramientas para profesionales</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'tienda/styles.css' %}">
+
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo">
+                    Ferre<span>Mas</span>
+                </div>
+                
+                <div class="header-tools">
+                    <div class="search-bar">
+                        <input type="text" placeholder="Buscar productos...">
+                        <button>🔍</button>
+                    </div>
+                    
+                    <div class="header-icons">
+                        <button class="icon-btn">👤</button>
+                        <button class="icon-btn">
+                            🛒
+                            <span class="cart-count">3</span>
+                        </button>
+                    </div>
+                    
+                    <button class="mobile-menu-btn">☰</button>
+                </div>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="#">Inicio</a></li>
+                    <li><a href="#">Herramientas</a></li>
+                    <li><a href="#">Materiales</a></li>
+                    <li><a href="#">Electricidad</a></li>
+                    <li><a href="#">Plomería</a></li>
+                    <li><a href="#">Construcción</a></li>
+                    <li><a href="#">Ofertas</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    {% block content %}
+    <!-- Hero Banner -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Herramientas <span>profesionales</span> para todo tipo de proyectos</h1>
+                <p>Encuentra todo lo que necesitas para tus proyectos de construcción, renovación y reparación con la mejor calidad y precios.</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn">Ver catálogo</a>
+                    <a href="#" class="btn btn-outline">Ofertas especiales</a>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="/api/placeholder/600/400" alt="Herramientas profesionales">
+        </div>
+    </section>
+    
+    <!-- Categorías -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Explora nuestras categorías</h2>
+                <p>Todo lo que necesitas para tu hogar o proyecto profesional</p>
+            </div>
+            
+            <div class="categories-grid">
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="/api/placeholder/300/300" alt="Herramientas eléctricas">
+                    </div>
+                    <div class="category-overlay">
+                        <div class="category-info">
+                            <h3>Herramientas eléctricas</h3>
+                            <p>Taladros, sierras, lijadoras y más</p>
+                            <a href="#" class="btn">Ver productos</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="/api/placeholder/300/300" alt="Herramientas manuales">
+                    </div>
+                    <div class="category-overlay">
+                        <div class="category-info">
+                            <h3>Herramientas manuales</h3>
+                            <p>Destornilladores, llaves, alicates y más</p>
+                            <a href="#" class="btn">Ver productos</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="/api/placeholder/300/300" alt="Plomería">
+                    </div>
+                    <div class="category-overlay">
+                        <div class="category-info">
+                            <h3>Plomería</h3>
+                            <p>Tuberías, conexiones, grifos y más</p>
+                            <a href="#" class="btn">Ver productos</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="/api/placeholder/300/300" alt="Materiales de construcción">
+                    </div>
+                    <div class="category-overlay">
+                        <div class="category-info">
+                            <h3>Materiales de construcción</h3>
+                            <p>Cemento, arena, ladrillos y más</p>
+                            <a href="#" class="btn">Ver productos</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Productos destacados -->
+    <section class="section bg-light">
+        <div class="container">
+            <div class="section-header">
+                <h2>Productos destacados</h2>
+                <p>Las mejores herramientas seleccionadas para ti</p>
+            </div>
+            
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <span class="product-badge badge-new">Nuevo</span>
+                        <img src="/api/placeholder/250/200" alt="Taladro profesional">
+                        <div class="product-actions">
+                            <button class="action-btn">❤️</button>
+                            <button class="action-btn">🔍</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Herramientas eléctricas</div>
+                        <a href="#">
+                            <h3>Taladro Inalámbrico Profesional 20V</h3>
+                        </a>
+                        <div class="product-price">
+                            <span class="current-price">$129.99</span>
+                            <span class="old-price">$149.99</span>
+                        </div>
+                        <button class="add-to-cart">🛒 Añadir al carrito</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <span class="product-badge badge-sale">-20%</span>
+                        <img src="/api/placeholder/250/200" alt="Set de destornilladores">
+                        <div class="product-actions">
+                            <button class="action-btn">❤️</button>
+                            <button class="action-btn">🔍</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Herramientas manuales</div>
+                        <a href="#">
+                            <h3>Set de Destornilladores Precisión 42 piezas</h3>
+                        </a>
+                        <div class="product-price">
+                            <span class="current-price">$39.99</span>
+                            <span class="old-price">$49.99</span>
+                        </div>
+                        <button class="add-to-cart">🛒 Añadir al carrito</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="/api/placeholder/250/200" alt="Juego de llaves">
+                        <div class="product-actions">
+                            <button class="action-btn">❤️</button>
+                            <button class="action-btn">🔍</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Herramientas manuales</div>
+                        <a href="#">
+                            <h3>Juego de Llaves Combinadas Profesionales 8-19mm</h3>
+                        </a>
+                        <div class="product-price">
+                            <span class="current-price">$45.99</span>
+                        </div>
+                        <button class="add-to-cart">🛒 Añadir al carrito</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="/api/placeholder/250/200" alt="Sierra circular">
+                        <div class="product-actions">
+                            <button class="action-btn">❤️</button>
+                            <button class="action-btn">🔍</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Herramientas eléctricas</div>
+                        <a href="#">
+                            <h3>Sierra Circular Profesional 1500W con Guía Láser</h3>
+                        </a>
+                        <div class="product-price">
+                            <span class="current-price">$119.99</span>
+                            <span class="old-price">$139.99</span>
+                        </div>
+                        <button class="add-to-cart">🛒 Añadir al carrito</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Beneficios / Características -->
+    <section class="features section">
+        <div class="container">
+            <div class="section-header">
+                <h2>¿Por qué elegirnos?</h2>
+                <p>Descubre las ventajas de comprar en FerreTools</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚚</div>
+                    <h3>Envío rápido</h3>
+                    <p>Entrega en 24-48 horas en todas las compras superiores a $50</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💯</div>
+                    <h3>Garantía de calidad</h3>
+                    <p>Todas nuestras herramientas cuentan con garantía por defectos de fabricación</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Devoluciones fáciles</h3>
+                    <p>30 días para devolver tu compra si no estás satisfecho</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">👨‍🔧</div>
+                    <h3>Asesoramiento técnico</h3>
+                    <p>Expertos disponibles para resolver tus dudas y ayudarte a elegir</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Banner -->
+    <section class="cta-banner">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Todo lo que necesitas para tu próximo proyecto</h2>
+                <p>Regístrate ahora y obtén un 10% de descuento en tu primera compra</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn">Crear cuenta</a>
+                    <a href="#" class="btn btn-outline">Ver ofertas actuales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endblock %}
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Sobre nosotros</h3>
+                    <p>En FerreMas nos dedicamos a ofrecer las mejores herramientas y materiales para profesionales y aficionados desde 2010.</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon">🔠</a>
+                        <a href="#" class="social-icon">📷</a>
+                        <a href="#" class="social-icon">🎯</a>
+                        <a href="#" class="social-icon">👥</a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Enlaces rápidos</h3>
+                    <ul>
+                        <li><a href="#">Inicio</a></li>
+                        <li><a href="#">Catálogo</a></li>
+                        <li><a href="#">Ofertas especiales</a></li>
+                        <li><a href="#">Proyectos DIY</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Categorías</h3>
+                    <ul>
+                        <li><a href="#">Herramientas eléctricas</a></li>
+                        <li><a href="#">Herramientas manuales</a></li>
+                        <li><a href="#">Materiales de construcción</a></li>
+                        <li><a href="#">Plomería</a></li>
+                        <li><a href="#">Electricidad</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contáctanos</h3>
+                    <div class="contact-info">
+                        <div class="contact-icon">📍</div>
+                        <p>Av. Principal 1234, Ciudad</p>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-icon">📞</div>
+                        <p>+56 2 2123 4567</p>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-icon">✉️</div>
+                        <p>info@ferremas.cl</p>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-icon">⏰</div>
+                        <p>Lun-Sáb: 8:30 - 19:00</p>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Newsletter</h3>
+                    <p>Suscríbete para recibir ofertas especiales y noticias sobre nuevos productos.</p>
+                    <div class="newsletter">
+                        <input type="email" placeholder="Tu correo electrónico">
+                        <button class="btn">Suscribirse</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 FerreMas. Todos los derechos reservados | Diseñado con ❤️ para profesionales</p>
+            </div>
+        </div>
+    </footer>

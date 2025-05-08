@@ -1,0 +1,14 @@
+{% extends "tienda/inicio.html" %}
+{% block content %}
+    <h1>Lista de Productos</h1>
+    <ul>
+        {% for producto in productos %}
+        <li>
+            <h3>{{ producto.nombre }}</h3>
+            <p>{{ producto.descripcion }}</p>
+            <p>Precio: ${{ producto.precio }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
