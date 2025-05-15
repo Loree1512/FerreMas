@@ -25,19 +25,24 @@
                     
                     <div class="header-icons">
                         <button class="icon-btn">👤</button>
-                        <button class="icon-btn">
+                        <a href="#" onclick="mostrarCarrito()" class="carrito-icono">
                             🛒
-                            <span class="cart-count">3</span>
-                        </button>
+                        </a>
                     </div>
-                    
+                    <div id="carrito-panel" style="display:none; position:fixed; right:20px; top:60px; background:white; border:1px solid #ccc; padding:10px; z-index:1000;">
+                        <h3>🛒 Carrito <span id="carrito-cantidad">(0)</span></h3>
+                        <ul id="carrito-lista"></ul>
+                        <p>Total: $<span id="total">0</span></p>
+                        <button onclick="vaciarCarrito()">Vaciar carrito</button>
+                        <button onclick="irACheckout()">Finalizar compra</button>
+                    </div>      
                     <button class="mobile-menu-btn">☰</button>
                 </div>
             </div>
             
             <nav>
                 <ul>
-                    <li><a href="#">Inicio</a></li>
+                    <li><a href="{% url 'inicio' %}">Inicio</a></li>
                     <li><a href="#">Herramientas</a></li>
                     <li><a href="#">Materiales</a></li>
                     <li><a href="#">Electricidad</a></li>
@@ -57,7 +62,7 @@
                 <h1>Herramientas <span>profesionales</span> para todo tipo de proyectos</h1>
                 <p>Encuentra todo lo que necesitas para tus proyectos de construcción, renovación y reparación con la mejor calidad y precios.</p>
                 <div class="cta-buttons">
-                    <a href="#" class="btn">Ver catálogo</a>
+                    <a href="{% url 'lista_productos' %}" class="btn">Ver catálogo</a>
                     <a href="#" class="btn btn-outline">Ofertas especiales</a>
                 </div>
             </div>
@@ -349,3 +354,52 @@
             </div>
         </div>
     </footer>
+    <script>
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || []
+        actualizarCarrito()
+    
+        function agregarAlCarrito(id, nombre, precio) {
+            const productoExistente = carrito.find(item => item.id === id)
+            if (productoExistente) {
+                productoExistente.cantidad += 1
+            } else {
+                carrito.push({ id, nombre, precio, cantidad: 1 })
+            }
+            localStorage.setItem('carrito', JSON.stringify(carrito))
+            actualizarCarrito()
+        }
+    
+        function actualizarCarrito() {
+            document.getElementById('carrito-cantidad').innerText = `(${carrito.reduce((a, b) => a + b.cantidad, 0)})`
+            const lista = document.getElementById('carrito-lista')
+            const totalElemento = document.getElementById('total')
+            if (!lista || !totalElemento) return
+    
+            lista.innerHTML = ''
+            let total = 0
+            carrito.forEach(item => {
+                const li = document.createElement('li')
+                li.innerText = `${item.nombre} x${item.cantidad} - $${(item.precio * item.cantidad).toFixed(2)}`
+                lista.appendChild(li)
+                total += item.precio * item.cantidad
+            })
+            totalElemento.innerText = total.toFixed(2)
+        }
+    
+        function mostrarCarrito() {
+            const panel = document.getElementById('carrito-panel')
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none'
+        }
+    
+        function vaciarCarrito() {
+            carrito = []
+            localStorage.removeItem('carrito')
+            actualizarCarrito()
+            document.getElementById('carrito-panel').style.display = 'none'
+        }
+    
+        function irACheckout() {
+            // Redirigir a una página de checkout (opcional)
+            window.location.href = '/checkout/'  // si decides crear esta vista
+        }
+    </script>
