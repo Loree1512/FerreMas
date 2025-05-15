@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-
-# Create your views here.
 from .models import Producto
+# Create your views here.
+
 
 def inicio(request):
     return render(request, 'tienda/inicio.html')
