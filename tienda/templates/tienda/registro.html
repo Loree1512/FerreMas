@@ -1,53 +1,60 @@
-{% extends "tienda/inicio.html" %}
+{% extends 'tienda/inicio.html' %}
 {% block content %}
-    <h1>Lista de Productos</h1>
-    <ul>
-        {% for producto in productos %}
-        <li>
-            <h3>{{ producto.nombre }}</h3>
-            <p>{{ producto.descripcion }}</p>
-            <p>Precio: ${{ producto.precio }}</p>
-            <button onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre|escapejs }}', {{ producto.precio }})">
-                Agregar al carrito
-            </button>
-        </li>
-        {% endfor %}
-    </ul>
+    <h1>Registrar Nuevo Usuario</h1>
+    <form method="POST">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Nombre de usuario" required><br>
+    <input type="email" name="email" placeholder="Correo" required><br>
+    <input type="password" name="password" placeholder="Contraseña" required><br>
+    <button type="submit">Registrarse</button>
+    </form>
 {% endblock %}
     <script>
         let carrito = JSON.parse(localStorage.getItem('carrito')) || []
         actualizarCarrito()
+    
         function agregarAlCarrito(id, nombre, precio) {
             const productoExistente = carrito.find(item => item.id === id)
             if (productoExistente) {
                 productoExistente.cantidad += 1
             } else {
-                carrito.push({id, nombre, precio, cantidad: 1})
+                carrito.push({ id, nombre, precio, cantidad: 1 })
             }
             localStorage.setItem('carrito', JSON.stringify(carrito))
             actualizarCarrito()
         }
+    
         function actualizarCarrito() {
+            document.getElementById('carrito-cantidad').innerText = `(${carrito.reduce((a, b) => a + b.cantidad, 0)})`
             const lista = document.getElementById('carrito-lista')
             const totalElemento = document.getElementById('total')
+            if (!lista || !totalElemento) return
+    
             lista.innerHTML = ''
             let total = 0
-    
             carrito.forEach(item => {
                 const li = document.createElement('li')
                 li.innerText = `${item.nombre} x${item.cantidad} - $${(item.precio * item.cantidad).toFixed(2)}`
                 lista.appendChild(li)
                 total += item.precio * item.cantidad
             })
-    
             totalElemento.innerText = total.toFixed(2)
         }
-    </script>
-    <button onclick="vaciarCarrito()">Vaciar carrito</button>
-    <script>
+    
+        function mostrarCarrito() {
+            const panel = document.getElementById('carrito-panel')
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none'
+        }
+    
         function vaciarCarrito() {
             carrito = []
             localStorage.removeItem('carrito')
             actualizarCarrito()
+            document.getElementById('carrito-panel').style.display = 'none'
+        }
+    
+        function irACheckout() {
+            // Redirigir a una página de checkout (opcional)
+            window.location.href = '/checkout/'  // si decides crear esta vista
         }
     </script>

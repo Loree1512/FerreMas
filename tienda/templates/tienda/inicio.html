@@ -6,7 +6,6 @@
     <title>FerreMas - Herramientas para profesionales</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'tienda/styles.css' %}">
-
 </head>
 <body>
     <!-- Header -->
@@ -22,9 +21,8 @@
                         <input type="text" placeholder="Buscar productos...">
                         <button>🔍</button>
                     </div>
-                    
                     <div class="header-icons">
-                        <button class="icon-btn">👤</button>
+                        <button class="icon-btn" id="userBtn">👤</button>
                         <a href="#" onclick="mostrarCarrito()" class="carrito-icono">
                             🛒
                         </a>
@@ -43,7 +41,7 @@
             <nav>
                 <ul>
                     <li><a href="{% url 'inicio' %}">Inicio</a></li>
-                    <li><a href="#">Herramientas</a></li>
+                    <li><a href="{% url 'lista_productos' %}">Herramientas</a></li>
                     <li><a href="#">Materiales</a></li>
                     <li><a href="#">Electricidad</a></li>
                     <li><a href="#">Plomería</a></li>
