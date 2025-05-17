@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import Producto
+from django.conf import settings
 # Create your views here.
 
 
@@ -37,3 +38,19 @@ def register_view(request):
         return redirect('inicio')  # O redirige donde tú quieras
 
     return render(request, 'tienda/registro.html')
+
+def mapa_ubicacion(request):
+    """Vista para mostrar la ubicación de la ferretería en el mapa."""
+    context = {
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+        'titulo': 'Nuestra Ubicación',
+        'ubicacion': {
+            'lat': -33.024,  # Reemplaza con la latitud de tu ferretería
+            'lng': -71.552,  # Reemplaza con la longitud de tu ferretería
+            'nombre': 'FerreTools',
+            'direccion': 'Av. Principal 1234, Ciudad',
+            'telefono': '+56 2 2123 4567',
+            'horario': 'Lun-Sáb 8:30 - 19:00'
+        }
+    }
+    return render(request, 'tienda/mapa_ubicacion.html', context)
