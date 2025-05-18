@@ -1,0 +1,68 @@
+{% extends 'tienda/inicio.html' %}
+{% block content %}
+    <h2>Iniciar Sesión</h2>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label for="username">Usuario:</label>
+        <input type="text" name="username" required><br>
+        <label for="password">Contraseña:</label>
+        <input type="password" name="password" required><br>
+        <button type="submit">Entrar</button>
+    </form>
+{% endblock %}
+    <script>
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || []
+        actualizarCarrito()
+    
+        function agregarAlCarrito(id, nombre, precio) {
+            const productoExistente = carrito.find(item => item.id === id)
+            if (productoExistente) {
+                productoExistente.cantidad += 1
+            } else {
+                carrito.push({ id, nombre, precio, cantidad: 1 })
+            }
+            localStorage.setItem('carrito', JSON.stringify(carrito))
+            actualizarCarrito()
+        }
+    
+        function actualizarCarrito() {
+            document.getElementById('carrito-cantidad').innerText = `(${carrito.reduce((a, b) => a + b.cantidad, 0)})`
+            const lista = document.getElementById('carrito-lista')
+            const totalElemento = document.getElementById('total')
+            if (!lista || !totalElemento) return
+    
+            lista.innerHTML = ''
+            let total = 0
+            carrito.forEach(item => {
+                const li = document.createElement('li')
+                li.innerText = `${item.nombre} x${item.cantidad} - $${(item.precio * item.cantidad).toFixed(2)}`
+                lista.appendChild(li)
+                total += item.precio * item.cantidad
+            })
+            totalElemento.innerText = total.toFixed(2)
+        }
+    
+        function mostrarCarrito() {
+            const panel = document.getElementById('carrito-panel')
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none'
+        }
+    
+        function vaciarCarrito() {
+            carrito = []
+            localStorage.removeItem('carrito')
+            actualizarCarrito()
+            document.getElementById('carrito-panel').style.display = 'none'
+        }
+    
+        function irACheckout() {
+            // Redirigir a una página de checkout (opcional)
+            window.location.href = '/checkout/'  // si decides crear esta vista
+        }
+    </script>

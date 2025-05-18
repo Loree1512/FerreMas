@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Producto
 from django.conf import settings
@@ -8,6 +10,14 @@ from django.conf import settings
 
 def inicio(request):
     return render(request, 'tienda/inicio.html')
+
+@login_required
+def inicio_view(request):
+    return render(request, 'tienda/inicio.html', {'usuario': request.user})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')  # Redirige al login después de cerrar sesión
 
 def lista_productos(request):
     productos = Producto.objects.all()
@@ -54,3 +64,17 @@ def mapa_ubicacion(request):
         }
     }
     return render(request, 'tienda/mapa_ubicacion.html', context)
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('inicio')  # Usa el nombre definido en urls.py
+        else:
+            messages.error(request, 'Usuario o contraseña inválidos.')
+
+    return render(request, 'tienda/login.html')

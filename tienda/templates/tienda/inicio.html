@@ -23,6 +23,9 @@
                     </div>
                     <div class="header-icons">
                         <button class="icon-btn" id="userBtn">👤</button>
+                        <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        </form>
                         <a href="#" onclick="mostrarCarrito()" class="carrito-icono">
                             🛒
                         </a>
@@ -37,7 +40,12 @@
                     <button class="mobile-menu-btn">☰</button>
                 </div>
             </div>
-            
+            {% if request.user.is_authenticated %}
+            <h1>Bienvenido, {{ request.user.username }}!</h1>
+            <a href="{% url 'logout' %}">Cerrar sesión</a>
+            {% else %}
+            <p>No has iniciado sesión. <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+            {% endif %}
             <nav>
                 <ul>
                     <li><a href="{% url 'inicio' %}">Inicio</a></li>
