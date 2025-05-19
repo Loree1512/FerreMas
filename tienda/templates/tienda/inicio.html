@@ -28,6 +28,7 @@
                         </form>
                         <a href="#" onclick="mostrarCarrito()" class="carrito-icono">
                             🛒
+                            <span id="carrito-cantidad" class="cart-count">0</span>
                         </a>
                     </div>
                     <div id="carrito-panel" style="display:none; position:fixed; right:20px; top:60px; background:white; border:1px solid #ccc; padding:10px; z-index:1000;">
@@ -74,7 +75,7 @@
             </div>
         </div>
         <div class="hero-image">
-            <img src="/api/placeholder/600/400" alt="Herramientas profesionales">
+           <img src="{% static 'tienda/img/herramienta-trabajar-equipos_231794-3278.jpg' %}" alt="Herramientas profesionales">
         </div>
     </section>
     
@@ -89,7 +90,7 @@
             <div class="categories-grid">
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="/api/placeholder/300/300" alt="Herramientas eléctricas">
+                        <img src="{% static 'tienda/img/ramiet-1.jpg' %}" alt="Herramientas eléctricas">
                     </div>
                     <div class="category-overlay">
                         <div class="category-info">
@@ -102,7 +103,7 @@
                 
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="/api/placeholder/300/300" alt="Herramientas manuales">
+                        <img src="{% static 'tienda/img/herramienta-trabajar-equipos_231794-3278.jpg' %}" alt="Herramientas manuales">
                     </div>
                     <div class="category-overlay">
                         <div class="category-info">
@@ -115,7 +116,7 @@
                 
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="/api/placeholder/300/300" alt="Plomería">
+                        <img src="{% static 'tienda/img/tuberia-herramientas-plomeria-fijaciones-sobre-fondo-madera-rustica-mejoras-hogar_601748-2678.avif' %}" alt="Plomería">
                     </div>
                     <div class="category-overlay">
                         <div class="category-info">
@@ -128,7 +129,7 @@
                 
                 <div class="category-card">
                     <div class="category-image">
-                        <img src="/api/placeholder/300/300" alt="Materiales de construcción">
+                        <img src="{% static 'tienda/img/tipos-de-materiales-portada-casa-lima.jpg' %}" alt="Materiales de construcción">
                     </div>
                     <div class="category-overlay">
                         <div class="category-info">

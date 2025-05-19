@@ -1,18 +1,45 @@
 {% extends "tienda/inicio.html" %}
 {% block content %}
-    <h1>Lista de Productos</h1>
-    <ul>
-        {% for producto in productos %}
-        <li>
-            <h3>{{ producto.nombre }}</h3>
-            <p>{{ producto.descripcion }}</p>
-            <p>Precio: ${{ producto.precio }}</p>
-            <button onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre|escapejs }}', {{ producto.precio }})">
-                Agregar al carrito
-            </button>
-        </li>
-        {% endfor %}
-    </ul>
+<section class="container products-section" style="margin-top: 40px; margin-bottom: 40px;">
+        <div class="products-grid">
+            {% for producto in productos %}
+                <div class="product-card">
+                    <div class="product-image">
+                        {% if producto.es_nuevo %}
+                            <span class="product-tag tag-new">Nuevo</span>
+                        {% endif %}
+                        {% if producto.descuento > 0 %}
+                            <span class="product-tag tag-discount">-{{ producto.descuento }}%</span>
+                        {% endif %}
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                        {% else %}
+                            <img src="/api/placeholder/250/200" alt="{{ producto.nombre }}">
+                        {% endif %}
+                    </div>
+                    <div class="product-details">
+                        <div class="product-category">{{ producto.descripcion }}</div>
+                        <h4 class="product-title">{{ producto.nombre }}</h4>
+                        <div class="product-price">
+                            <span class="current-price">${{ producto.precio }}</span>
+                            {% if producto.precio_anterior %}
+                                <span class="old-price">${{ producto.precio_anterior }}</span>
+                            {% endif %}
+                        </div>
+                        <button class="add-to-cart" data-id="{{ producto.id }}" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre|escapejs }}', {{ producto.precio }})">
+                            <span class="cart-icon-btn">🛒</span> Añadir al carrito
+                        </button>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="no-products">
+                    <p>No hay productos disponibles en esta categoría.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+        
 {% endblock %}
     <script>
         let carrito = JSON.parse(localStorage.getItem('carrito')) || []
