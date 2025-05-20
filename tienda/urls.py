@@ -13,5 +13,11 @@ urlpatterns = [
     path('panel/inicio/', views.admin_inicio_view, name='admin_inicio'),
     path('logout/', views.logout_view, name='logout'),
     path('contacto/', views.contacto, name='contacto'),
+<<<<<<< HEAD
     path('categoria/<str:categoria>/', views.productos_por_categoria, name='productos_categoria'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+=======
+    path('checkout/', views.checkout_view, name='checkout'),
+    path('api/orden/', views.registrar_orden, name='registrar_orden'),
+]
+>>>>>>> b59b92c29817697d49532e0aa6e68c12ddd21b96

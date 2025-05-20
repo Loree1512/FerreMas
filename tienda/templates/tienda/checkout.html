@@ -1,0 +1,71 @@
+{% extends "tienda/inicio.html" %}
+
+{% block content %}
+    <script src="https://www.paypal.com/sdk/js?client-id=AeLEkESeZIbdS-FcliNZs4SgCfikmrh3GrRIX19F5hlaYpMdtO12JeEtvpiX077IHu9wHIeuO9k52jYG&currency=USD"></script>
+
+    <h1>Resumen de tu compra</h1>
+    <ul id="checkout-lista"></ul>
+    <p><strong>Total: $<span id="checkout-total">0</span></strong></p>
+
+    <div id="paypal-button-container"></div>
+    <script>
+        const carrito = JSON.parse(localStorage.getItem('carrito')) || []
+
+        const lista = document.getElementById('checkout-lista')
+        const totalElemento = document.getElementById('checkout-total')
+
+        let total = 0
+        carrito.forEach(item => {
+            const li = document.createElement('li')
+            li.innerText = `${item.nombre} x${item.cantidad} - $${(item.precio * item.cantidad).toFixed(2)}`
+            lista.appendChild(li)
+            total += item.precio * item.cantidad
+        })
+        totalElemento.innerText = total.toFixed(2)
+
+        // Renderizar botón de PayPal después de que todo esté listo
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: total.toFixed(2)
+                        },
+                        description: 'Compra en FerreMas'
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    const nombre = details.payer.name.given_name
+                    const email = details.payer.email_address
+
+                    // Enviar orden al backend
+                    fetch('/api/orden/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            carrito: carrito,
+                            total: total.toFixed(2),
+                            nombre: nombre,
+                            email: email
+                        })
+                    }).then(() => {
+                        alert('Gracias por tu compra, ' + nombre + ' 🎉')
+                        localStorage.removeItem('carrito')
+                        window.location.href = '/'
+                    })
+                })
+            },
+            onCancel: function(data) {
+                alert('Pago cancelado ❌');
+            },
+            onError: function(err) {
+                console.error('Error en el pago:', err);
+                alert('Ocurrió un error en el proceso de pago.');
+            }
+        }).render('#paypal-button-container');
+    </script>
+{% endblock %}
