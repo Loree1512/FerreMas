@@ -45,16 +45,16 @@
             <h1>Bienvenido, {{ request.user.username }}!</h1>
             <a href="{% url 'logout' %}">Cerrar sesión</a>
             {% else %}
-            <p>No has iniciado sesión. <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+            <p>No has iniciado sesión. <a href="{% url 'login' %}" style="color: blue; text-decoration: underline;">Inicia sesión aquí</a></p>
             {% endif %}
             <nav>
                 <ul>
                     <li><a href="{% url 'inicio' %}">Inicio</a></li>
-                    <li><a href="{% url 'lista_productos' %}">Herramientas</a></li>
-                    <li><a href="#">Materiales</a></li>
-                    <li><a href="#">Electricidad</a></li>
-                    <li><a href="#">Plomería</a></li>
-                    <li><a href="#">Construcción</a></li>
+                    <li><a href="{% url 'lista_productos' %}">Productos</a></li>
+                    <li><a href="{% url 'productos_categoria' categoria='manuales' %}">Herramienta Manuales</a></li>
+                    <li><a href="{% url 'productos_categoria' categoria='electronica' %}">Herramientas Elec.</a></li>
+                    <li><a href="{% url 'productos_categoria' categoria='plomeria' %}">Plomería</a></li>
+                    <li><a href="{% url 'productos_categoria' categoria='materiales' %}">Materiales de Construcción</a></li>
                     <li><a href="#">Ofertas</a></li>
                     <li><a href="{% url 'contacto' %}">Contacto</a></li>
                 </ul>

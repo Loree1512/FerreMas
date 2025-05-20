@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.inicio, name='inicio'),
@@ -11,4 +13,5 @@ urlpatterns = [
     path('panel/inicio/', views.admin_inicio_view, name='admin_inicio'),
     path('logout/', views.logout_view, name='logout'),
     path('contacto/', views.contacto, name='contacto'),
-]
+    path('categoria/<str:categoria>/', views.productos_por_categoria, name='productos_categoria'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

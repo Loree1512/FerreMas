@@ -114,3 +114,10 @@ def login_view(request):
             return render(request, 'tienda/login.html', {'error': 'Credenciales incorrectas'})
 
     return render(request, 'tienda/login.html')
+
+def productos_por_categoria(request, categoria):
+    productos = Producto.objects.filter(categoria=categoria)
+    return render(request, 'tienda/productos_categoria.html', {
+        'productos': productos,
+        'categoria_actual': categoria
+    })
