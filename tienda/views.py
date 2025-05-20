@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Producto
+from .forms import ProductoForm
 from django.conf import settings
 # Create your views here.
 
@@ -13,7 +14,25 @@ def inicio(request):
 
 @login_required
 def inicio_view(request):
-    return render(request, 'tienda/inicio.html', {'usuario': request.user})
+    if request.user.is_staff or request.user.is_superuser:
+        return redirect('admin_inicio')
+    return render(request, 'tienda/inicio.html')
+
+@login_required
+def admin_inicio_view(request):
+    if not request.user.is_staff and not request.user.is_superuser:
+        return redirect('inicio')
+
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_inicio')
+    else:
+        form = ProductoForm()
+
+    productos = Producto.objects.all()
+    return render(request, 'tienda/admin_inicio.html', {'form': form, 'productos': productos})
 
 def logout_view(request):
     logout(request)
@@ -87,8 +106,11 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect('inicio')  # Usa el nombre definido en urls.py
+            if user.is_staff or user.is_superuser:
+                return redirect('admin_inicio')  # Redirigir a vista de administrador
+            else:
+                return redirect('inicio')  # Redirigir a vista de usuario común
         else:
-            messages.error(request, 'Usuario o contraseña inválidos.')
+            return render(request, 'tienda/login.html', {'error': 'Credenciales incorrectas'})
 
     return render(request, 'tienda/login.html')
