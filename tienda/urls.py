@@ -9,4 +9,5 @@ urlpatterns = [
     path('ubicacion/', views.mapa_ubicacion, name='mapa_ubicacion'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('contacto/', views.contacto, name='contacto'),
 ]

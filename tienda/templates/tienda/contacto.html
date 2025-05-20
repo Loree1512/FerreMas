@@ -1,0 +1,186 @@
+{% extends "tienda/inicio.html" %}
+{% load static %}
+{% block content %}
+  <div class="container">
+        <div class="page-header">
+            <h2>Contacto</h2>
+            <p>Estamos aquí para ayudarte. Contáctanos con tus preguntas, consultas o sugerencias y te responderemos a la brevedad.</p>
+        </div>
+    </div>
+    
+    <!-- Contact Content -->
+    <div class="container">
+        <div class="contact-container">
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h3>Envíanos un mensaje</h3>
+                <form action="#" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="name">Nombre Completo</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Teléfono (opcional)</label>
+                        <input type="tel" id="phone" name="phone" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Asunto</label>
+                        <input type="text" id="subject" name="subject" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Mensaje</label>
+                        <textarea id="message" name="message" class="form-control" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                    
+                    {% if messages %}
+                        <div class="alert alert-success mt-3">
+                            {% for message in messages %}
+                                <p>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+            
+            <!-- Contact Info & Map -->
+            <div class="contact-info-map">
+                <div class="contact-info">
+                    <h3>Información de Contacto</h3>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">📍</div>
+                        <div class="info-content">
+                            <h4>Dirección</h4>
+                            <p>Av. Libertad 1348, Viña del Mar, Región de Valparaíso, Chile</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">📞</div>
+                        <div class="info-content">
+                            <h4>Teléfono</h4>
+                            <p>+56 32 2975 641</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">✉️</div>
+                        <div class="info-content">
+                            <h4>Email</h4>
+                            <p>contacto@ferremas.cl</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">🕒</div>
+                        <div class="info-content">
+                            <h4>Horario de Atención</h4>
+                            <p>Lunes a Viernes: 8:30 AM - 6:30 PM</p>
+                            <p>Sábados: 9:00 AM - 2:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <h3>Nuestra Ubicación</h3>
+                    <!-- Google Maps iframe - Reemplazar con tu API Key y ubicación exacta -->
+                    <iframe 
+                        class="map-frame" 
+                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAfedr3syURuP6LBv3Jg_FrRhO4Dy-DL2Y&q=Av.+Libertad+1348,+Viña+del+Mar,+Chile" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Branch Locations -->
+        <div class="branch-locations">
+            <h3>Nuestras Sucursales</h3>
+            
+            <div class="branches-grid">
+                <!-- Branch 1 -->
+                <div class="branch-card">
+                    <div class="branch-image">
+                        <img src="{% static 'tienda/img/ChatGPT Image 19 may 2025, 22_05_28.png' %}" alt="Sucursal Viña del Mar">
+                    </div>
+                    <div class="branch-details">
+                        <h4 class="branch-name">FerreMas Viña del Mar</h4>
+                        <p class="branch-address">Av. Libertad 1348, Viña del Mar, Chile</p>
+                        <p class="branch-phone">+56 32 2975 641</p>
+                        
+                        <div class="branch-hours">
+                            <h5>Horario de Atención:</h5>
+                            <p>Lun - Vie: 8:30 AM - 6:30 PM</p>
+                            <p>Sábados: 9:00 AM - 2:00 PM</p>
+                        </div>
+                        
+                        <a href="#" class="view-map-btn" data-lat="-33.0153481" data-lng="-71.5512984">Ver en Mapa</a>
+                    </div>
+                </div>
+                
+                <!-- Branch 2 -->
+                <div class="branch-card">
+                    <div class="branch-image">
+                        <img src="{% static 'tienda/img/ChatGPT Image 19 may 2025, 22_05_34.png' %}" alt="Sucursal Quilpué">
+                    </div>
+                    <div class="branch-details">
+                        <h4 class="branch-name">FerreMas Quilpué</h4>
+                        <p class="branch-address">Av. Los Carrera 954, Quilpué, Chile</p>
+                        <p class="branch-phone">+56 32 2912 783</p>
+                        
+                        <div class="branch-hours">
+                            <h5>Horario de Atención:</h5>
+                            <p>Lun - Vie: 8:30 AM - 6:30 PM</p>
+                            <p>Sábados: 9:00 AM - 2:00 PM</p>
+                        </div>
+                        
+                        <a href="#" class="view-map-btn" data-lat="-33.0476868" data-lng="-71.4408396">Ver en Mapa</a>
+                    </div>
+                </div>
+                
+                <!-- Branch 3 -->
+                <div class="branch-card">
+                    <div class="branch-image">
+                        <img src="{% static 'tienda/img/ChatGPT Image 19 may 2025, 22_24_06.png' %}" alt="Sucursal Valparaíso">
+                    </div>
+                    <div class="branch-details">
+                        <h4 class="branch-name">FerreMas Valparaíso</h4>
+                        <p class="branch-address">Av. Pedro Montt 1865, Valparaíso, Chile</p>
+                        <p class="branch-phone">+56 32 2215 968</p>
+                        
+                        <div class="branch-hours">
+                            <h5>Horario de Atención:</h5>
+                            <p>Lun - Vie: 8:30 AM - 6:30 PM</p>
+                            <p>Sábados: 9:00 AM - 2:00 PM</p>
+                        </div>
+                        
+                        <a href="#" class="view-map-btn" data-lat="-33.0472033" data-lng="-71.6067128">Ver en Mapa</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+document.querySelectorAll('.view-map-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const lat = btn.getAttribute('data-lat');
+        const lng = btn.getAttribute('data-lng');
+        const url = `https://www.google.com/maps?q=${lat},${lng}`;
+        window.open(url, '_blank');
+    });
+});
+</script>
+{% endblock %}

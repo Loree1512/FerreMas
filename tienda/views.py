@@ -64,6 +64,20 @@ def mapa_ubicacion(request):
         }
     }
     return render(request, 'tienda/mapa_ubicacion.html', context)
+def contacto(request):
+    return render(request, 'tienda/contacto.html')
+
+def contact_send(request):
+    if request.method == 'POST':
+        # Procesar formulario
+        nombre = request.POST.get('name')
+        email = request.POST.get('email')
+        # ... procesar otros campos
+        
+        # Añadir mensaje de confirmación
+        messages.success(request, 'Tu mensaje ha sido enviado correctamente.')
+        
+    return redirect('contacto')
 
 def login_view(request):
     if request.method == 'POST':
