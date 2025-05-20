@@ -1,6 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Perfil(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    ROL_CHOICES = [
+        ('vendedor', 'Vendedor'),
+        ('bodeguero', 'Bodeguero'),
+        ('contador', 'Contador'),
+    ]
+    rol = models.CharField(max_length=20, choices=ROL_CHOICES)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.rol}'
+
 class Producto(models.Model):
     CATEGORIAS = [
         ('manuales', 'Herramientas manuales'),
@@ -24,6 +36,16 @@ class Orden(models.Model):
     email = models.EmailField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
     fecha = models.DateTimeField(auto_now_add=True)
+
+    ESTADOS = [
+        ('pendiente', 'Pendiente'),
+        ('preparando', 'Preparando'),
+        ('entregado_a_vendedor', 'Entregado a vendedor'),
+        ('entregado_a_cliente', 'Entregado a cliente'),
+    ]
+    estado = models.CharField(max_length=30, choices=ESTADOS, default='pendiente')
+
+    metodo_pago = models.CharField(max_length=30, default='paypal')  # o 'transferencia'
 
     def __str__(self):
         return f'Orden #{self.id} - {self.nombre_cliente}'

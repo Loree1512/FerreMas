@@ -1,0 +1,40 @@
+{% extends 'tienda/inicio.html' %}
+{% block content %}
+<h2>Panel Bodeguero</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for orden in ordenes %}
+        <tr>
+            <td>{{ orden.nombre_cliente }}</td>
+            <td>${{ orden.total }}</td>
+            <td>{{ orden.fecha }}</td>
+            <td>{{ orden.estado }}</td>
+            <td>
+                {% if orden.estado == 'pendiente' %}
+                <form method="post" action="{% url 'actualizar_estado_orden' orden.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="nuevo_estado" value="preparando">
+                    <button type="submit">Preparar</button>
+                </form>
+                {% elif orden.estado == 'preparando' %}
+                <form method="post" action="{% url 'actualizar_estado_orden' orden.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="nuevo_estado" value="entregado_a_vendedor">
+                    <button type="submit">Entregar a Vendedor</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

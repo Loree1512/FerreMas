@@ -37,6 +37,18 @@ def admin_inicio_view(request):
     productos = Producto.objects.all()
     return render(request, 'tienda/admin_inicio.html', {'form': form, 'productos': productos})
 
+
+@login_required
+def bodeguero_inicio(request):
+    ordenes = Orden.objects.all().order_by('-fecha')
+    return render(request, 'tienda/bodeguero/inicio.html', {'ordenes': ordenes})
+
+
+@login_required
+def contador_inicio(request):
+    ordenes = Orden.objects.filter(metodo_pago='transferencia')
+    return render(request, 'tienda/contador/inicio.html', {'ordenes': ordenes})
+
 def checkout_view(request):
     return render(request, 'tienda/checkout.html')
 
@@ -113,22 +125,26 @@ def login_view(request):
         if user is not None:
             login(request, user)
             if user.is_staff or user.is_superuser:
-                return redirect('admin_inicio')  # Redirigir a vista de administrador
+                perfil = getattr(user, 'perfil', None)
+                if perfil:
+                    if perfil.rol == 'bodeguero':
+                        return redirect('bodeguero_inicio')
+                    elif perfil.rol == 'contador':
+                        return redirect('contador_inicio')
+                return redirect('admin_inicio')  # Vendedor u otro staff
             else:
-                return redirect('inicio')  # Redirigir a vista de usuario común
+                return redirect('inicio')  # Usuario común
         else:
             return render(request, 'tienda/login.html', {'error': 'Credenciales incorrectas'})
 
     return render(request, 'tienda/login.html')
 
-<<<<<<< HEAD
 def productos_por_categoria(request, categoria):
     productos = Producto.objects.filter(categoria=categoria)
     return render(request, 'tienda/productos_categoria.html', {
         'productos': productos,
         'categoria_actual': categoria
     })
-=======
 @csrf_exempt
 def registrar_orden(request):
     if request.method == 'POST':
@@ -169,4 +185,21 @@ def registrar_orden(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
->>>>>>> b59b92c29817697d49532e0aa6e68c12ddd21b96
+
+@csrf_exempt
+@login_required
+def actualizar_estado_orden(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('nuevo_estado')
+        if nuevo_estado in dict(Orden.ESTADOS):
+            orden.estado = nuevo_estado
+            orden.save()
+    # Redirige según rol
+    rol = request.user.perfil.rol
+    if rol == 'bodeguero':
+        return redirect('bodeguero_inicio')
+    elif rol == 'contador':
+        return redirect('contador_inicio')
+    else:
+        return redirect('admin_inicio')

@@ -11,13 +11,13 @@ urlpatterns = [
     path('ubicacion/', views.mapa_ubicacion, name='mapa_ubicacion'),
     path('login/', views.login_view, name='login'),
     path('panel/inicio/', views.admin_inicio_view, name='admin_inicio'),
+    path('panel/inicio/', views.admin_inicio_view, name='admin_inicio'),
+    path('panel/bodeguero/', views.bodeguero_inicio, name='bodeguero_inicio'),
+    path('panel/contador/', views.contador_inicio, name='contador_inicio'), 
     path('logout/', views.logout_view, name='logout'),
     path('contacto/', views.contacto, name='contacto'),
-<<<<<<< HEAD
     path('categoria/<str:categoria>/', views.productos_por_categoria, name='productos_categoria'),
+    path('checkout/', views.checkout_view, name='checkout'),  # MOVIDO DENTRO DE LA LISTA
+    path('api/orden/', views.registrar_orden, name='registrar_orden'),  # MOVIDO DENTRO DE LA LISTA
+    path('orden/actualizar/<int:orden_id>/', views.actualizar_estado_orden, name='actualizar_estado_orden'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-=======
-    path('checkout/', views.checkout_view, name='checkout'),
-    path('api/orden/', views.registrar_orden, name='registrar_orden'),
-]
->>>>>>> b59b92c29817697d49532e0aa6e68c12ddd21b96
