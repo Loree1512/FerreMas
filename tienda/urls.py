@@ -11,4 +11,6 @@ urlpatterns = [
     path('panel/inicio/', views.admin_inicio_view, name='admin_inicio'),
     path('logout/', views.logout_view, name='logout'),
     path('contacto/', views.contacto, name='contacto'),
+    path('checkout/', views.checkout_view, name='checkout'),
+    path('api/orden/', views.registrar_orden, name='registrar_orden'),
 ]

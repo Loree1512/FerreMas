@@ -3,9 +3,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Producto
+from .models import Producto, Orden, ItemOrden
 from .forms import ProductoForm
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 # Create your views here.
 
 
@@ -33,6 +36,9 @@ def admin_inicio_view(request):
 
     productos = Producto.objects.all()
     return render(request, 'tienda/admin_inicio.html', {'form': form, 'productos': productos})
+
+def checkout_view(request):
+    return render(request, 'tienda/checkout.html')
 
 def logout_view(request):
     logout(request)
@@ -114,3 +120,44 @@ def login_view(request):
             return render(request, 'tienda/login.html', {'error': 'Credenciales incorrectas'})
 
     return render(request, 'tienda/login.html')
+
+@csrf_exempt
+def registrar_orden(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            carrito = data.get('carrito', [])
+            total = data.get('total')
+            nombre = data.get('nombre')
+            email = data.get('email')
+
+            orden = Orden.objects.create(
+                nombre_cliente=nombre,
+                email=email,
+                total=total,
+                usuario=request.user if request.user.is_authenticated else None
+            )
+
+            for item in carrito:
+                try:
+                    producto = Producto.objects.get(id=item['id'])
+                    ItemOrden.objects.create(
+                        orden=orden,
+                        producto=producto,
+                        cantidad=item['cantidad']
+                    )
+                except Producto.DoesNotExist:
+                    # Aquí puedes decidir qué hacer si un producto no existe
+                    # Por ejemplo, saltar ese item o devolver un error
+                    continue  # Ignora el producto y continúa con el siguiente
+
+            return JsonResponse({'status': 'ok', 'orden_id': orden.id})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'JSON inválido'}, status=400)
+        except KeyError as e:
+            return JsonResponse({'error': f'Falta el campo {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
