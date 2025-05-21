@@ -1,5 +1,6 @@
 {% extends "tienda/inicio.html" %}
 {% block content %}
+<<<<<<< HEAD
     
      <div class="container py-5">
     <div class="row">
@@ -174,4 +175,55 @@
                 </div>
             </div>
     
+=======
+    <h1>Bienvenido, administrador {{ request.user.username }}</h1>
+
+    <h2>Agregar nuevo producto</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar producto</button>
+    </form>
+
+    <h2>Productos existentes</h2>
+    <ul>
+        {% for producto in productos %}
+    <li>
+        <strong>{{ producto.nombre }}</strong> - ${{ producto.precio }} <br>
+        {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" width="100">
+        {% else %}
+            <p><em>Sin imagen</em></p>
+        {% endif %}
+    </li>
+    {% endfor %}
+    </ul>
+    <h2>Órdenes Recientes</h2>
+
+    {% for orden in ordenes %}
+        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+            <p><strong>Cliente:</strong> {{ orden.nombre_cliente }} ({{ orden.email }})</p>
+            <p><strong>Fecha:</strong> {{ orden.fecha }}</p>
+            <p><strong>Total:</strong> ${{ orden.total }}</p>
+            <p><strong>Estado:</strong> {{ orden.get_estado_display }}</p>
+
+            <ul>
+                {% for item in orden.items.all %}
+                    <li>{{ item.producto.nombre }} x{{ item.cantidad }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if orden.estado == 'pendiente' %}
+                <form method="post" action="{% url 'procesar_orden' orden.id %}">
+                    {% csrf_token %}
+                    <button type="submit" name="accion" value="aceptar">Aceptar</button>
+                    <button type="submit" name="accion" value="rechazar">Rechazar</button>
+                </form>
+            {% else %}
+                <p><em>Esta orden ya ha sido procesada.</em></p>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <a href="{% url 'logout' %}">Cerrar sesión</a>
+>>>>>>> 7e3731b0775a1bddfcb39d7273a862ec6f86d8bd
 {% endblock %}

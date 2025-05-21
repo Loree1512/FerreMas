@@ -85,6 +85,27 @@
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
+=======
+            {% if request.user.is_authenticated %}
+            <h1>Bienvenido, {{ request.user.username }}!</h1>
+            <a href="{% url 'logout' %}">Cerrar sesión</a>
+            {% else %}
+            <p>No has iniciado sesión. <a href="{% url 'login' %}" style="color: blue; text-decoration: underline;">Inicia sesión aquí</a></p>
+            {% endif %}
+            <nav>
+                <ul>
+                    <li><a href="{% url 'inicio' %}">Inicio</a></li>
+                    <li><a href="{% url 'lista_productos' %}">Productos</a></li>
+                    <li><a href="{% url 'productos_categoria' categoria='manuales' %}">Herramienta Manuales</a></li>
+                    <li><a href="{% url 'productos_categoria' categoria='electronica' %}">Herramientas Elec.</a></li>
+                    <li><a href="{% url 'productos_categoria' categoria='plomeria' %}">Plomería</a></li>
+                    <li><a href="{% url 'productos_categoria' categoria='materiales' %}">Materiales de Construcción</a></li>
+                    <li><a href="#">Ofertas</a></li>
+                    <li><a href="{% url 'contacto' %}">Contacto</a></li>
+                </ul>
+            </nav>
+>>>>>>> 7e3731b0775a1bddfcb39d7273a862ec6f86d8bd
         </div>
     </nav>
         

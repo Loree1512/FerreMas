@@ -7,8 +7,10 @@ from .models import Producto, Orden, ItemOrden
 from .forms import ProductoForm
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 import json
+from django.utils import timezone
 # Create your views here.
 
 
@@ -25,8 +27,9 @@ def inicio_view(request):
 def admin_inicio_view(request):
     if not request.user.is_staff and not request.user.is_superuser:
         return redirect('inicio')
-
-    if request.method == 'POST':
+    
+    # Procesamiento del formulario de productos
+    if request.method == 'POST' and 'agregar_producto' in request.POST:
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
@@ -34,8 +37,53 @@ def admin_inicio_view(request):
     else:
         form = ProductoForm()
 
+    # Carga de productos
     productos = Producto.objects.all()
-    return render(request, 'tienda/admin_inicio.html', {'form': form, 'productos': productos})
+
+    # Carga de órdenes
+    ordenes = Orden.objects.all().order_by('-fecha')
+
+    return render(request, 'tienda/admin_inicio.html', {
+        'form': form,
+        'productos': productos,
+        'ordenes': ordenes,
+    })
+    
+@require_POST
+@login_required
+def actualizar_estado_bodega(request, orden_id):
+    if not request.user.perfil.rol == 'bodeguero':
+        return redirect('inicio')
+
+    orden = Orden.objects.get(id=orden_id)
+    nuevo_estado = request.POST.get('estado')
+
+    if nuevo_estado in dict(Orden.ESTADOS):
+        orden.estado = nuevo_estado
+        orden.save()
+
+    return redirect('bodeguero_inicio')
+
+
+@login_required
+def bodeguero_inicio(request):
+    ordenes = Orden.objects.filter(estado__in=['preparando', 'entregado_a_vendedor', 'completado']).order_by('-fecha')
+    return render(request, 'tienda/bodeguero/inicio.html', {'ordenes': ordenes})
+
+@login_required
+def contador_inicio(request):
+    if request.user.perfil.rol != 'contador':
+        return redirect('inicio')
+
+    ordenes_pagadas = Orden.objects.filter(
+        estado='completado',
+        metodo_pago='paypal'  # o el valor que uses para identificar pagos PayPal
+    ).order_by('-fecha')
+
+    return render(request, 'tienda/contador/inicio.html', {
+        'ordenes': ordenes_pagadas
+    })
+
 
 def checkout_view(request):
     return render(request, 'tienda/checkout.html')
@@ -112,16 +160,31 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
+            perfil = getattr(user, 'perfil', None)
+            if perfil:
+                if perfil.rol == 'bodeguero':
+                    return redirect('bodeguero_inicio')
+                elif perfil.rol == 'contador':
+                    return redirect('contador_inicio')
             if user.is_staff or user.is_superuser:
-                return redirect('admin_inicio')  # Redirigir a vista de administrador
+                return redirect('admin_inicio')  # Vendedor u otro staff
             else:
-                return redirect('inicio')  # Redirigir a vista de usuario común
+                return redirect('inicio')  # Usuario común
         else:
             return render(request, 'tienda/login.html', {'error': 'Credenciales incorrectas'})
 
     return render(request, 'tienda/login.html')
 
+def productos_por_categoria(request, categoria):
+    productos = Producto.objects.filter(categoria=categoria)
+    return render(request, 'tienda/productos_categoria.html', {
+        'productos': productos,
+        'categoria_actual': categoria
+    })
 @csrf_exempt
+
+#REGISTRO ORDEN COMPRA
+
 def registrar_orden(request):
     if request.method == 'POST':
         try:
@@ -130,13 +193,25 @@ def registrar_orden(request):
             total = data.get('total')
             nombre = data.get('nombre')
             email = data.get('email')
+            paypal_payment_id = data.get('paypal_payment_id')  # nuevo campo
+            fecha_pago = data.get('fecha_pago')  # opcional, si lo envías como string datetime
 
             orden = Orden.objects.create(
                 nombre_cliente=nombre,
                 email=email,
                 total=total,
-                usuario=request.user if request.user.is_authenticated else None
+                usuario=request.user if request.user.is_authenticated else None,
+                paypal_payment_id=paypal_payment_id,  # guardar el id del pago
+                metodo_pago='paypal',  # marca que es pago PayPal
+                estado='pendiente',    # estado inicial, o el que uses
             )
+
+            # Si quieres guardar la fecha de pago y la recibes como string,
+            # deberías convertirla a datetime, ejemplo:
+            if fecha_pago:
+                from django.utils.dateparse import parse_datetime
+                orden.fecha_pago = parse_datetime(fecha_pago)
+                orden.save()
 
             for item in carrito:
                 try:
@@ -147,9 +222,7 @@ def registrar_orden(request):
                         cantidad=item['cantidad']
                     )
                 except Producto.DoesNotExist:
-                    # Aquí puedes decidir qué hacer si un producto no existe
-                    # Por ejemplo, saltar ese item o devolver un error
-                    continue  # Ignora el producto y continúa con el siguiente
+                    continue
 
             return JsonResponse({'status': 'ok', 'orden_id': orden.id})
 
@@ -161,3 +234,55 @@ def registrar_orden(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+
+@csrf_exempt
+@login_required
+def actualizar_estado_orden(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('nuevo_estado')
+
+        # Si el bodeguero quiere marcar como entregado, lo completamos
+        if nuevo_estado == 'entregado_a_vendedor':
+            orden.estado = 'completado'
+        elif nuevo_estado in dict(Orden.ESTADOS):
+            orden.estado = nuevo_estado
+
+        orden.save()
+
+    # Redirige según rol
+    rol = request.user.perfil.rol
+    if rol == 'bodeguero':
+        return redirect('bodeguero_inicio')
+    elif rol == 'contador':
+        return redirect('contador_inicio')
+    else:
+        return redirect('admin_inicio')
+
+
+
+@require_POST
+def procesar_orden(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+    accion = request.POST.get('accion')
+
+    if accion == 'aceptar':
+        orden.estado = 'preparando'
+    elif accion == 'rechazar':
+        orden.estado = 'rechazada'
+    orden.save()
+
+    return redirect('admin_inicio')
+
+@csrf_exempt
+@login_required
+def actualizar_estado_contador(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+    if request.method == 'POST' and request.user.perfil.rol == 'contador':
+        nuevo_estado = request.POST.get('nuevo_estado')
+        if nuevo_estado in dict(Orden.ESTADOS):
+            orden.estado = nuevo_estado
+            orden.save()
+    return redirect('contador_inicio')

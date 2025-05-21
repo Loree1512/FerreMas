@@ -1,0 +1,22 @@
+{% extends 'tienda/inicio.html' %}
+{% block content %}
+<h2>Pagos confirmados vía PayPal</h2>
+
+{% for orden in ordenes %}
+  <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+    <h4>Cliente: {{ orden.nombre_cliente }}</h4>
+    <p><strong>Fecha de pago:</strong> {{ orden.fecha_pago|date:"d/m/Y H:i" }}</p>
+    <p><strong>Email:</strong> {{ orden.email }}</p>
+    <p><strong>Total:</strong> ${{ orden.total }}</p>
+    <p><strong>ID de pago PayPal:</strong> {{ orden.paypal_payment_id }}</p>
+    <p><strong>Estado:</strong> {{ orden.estado }}</p>
+    <ul>
+      {% for item in orden.items.all %}
+        <li>{{ item.producto.nombre }} x{{ item.cantidad }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% empty %}
+  <p>No hay pagos confirmados aún.</p>
+{% endfor %}
+{% endblock %}
