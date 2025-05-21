@@ -6,60 +6,88 @@
     <title>FerreMas - Herramientas para profesionales</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'tienda/styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
     <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container">
-            <div class="header-top">
-                <div class="logo">
-                    Ferre<span>Mas</span>
-                </div>
-                
-                <div class="header-tools">
-                    <div class="search-bar">
-                        <input type="text" placeholder="Buscar productos...">
-                        <button>🔍</button>
-                    </div>
-                    <div class="header-icons">
-                        <button class="icon-btn" id="userBtn">👤</button>
-                        <form action="{% url 'logout' %}" method="post">
-                        {% csrf_token %}
-                        </form>
-                        <a href="#" onclick="mostrarCarrito()" class="carrito-icono">
-                            🛒
-                            <span id="carrito-cantidad" class="cart-count">0</span>
+            <a class="logo" href="#">Ferre<span>Mas</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'inicio' %}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'lista_productos' %}">Herramientas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Materiales</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Electricidad</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Plomería</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Construcción</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contacto' %}">Contacto</a>
+                    </li>
+                </ul>
+                <form class="d-flex me-3">
+                    <input class="form-control me-2" type="search" placeholder="Buscar productos...">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                <div class="d-flex align-items-center">
+                    <div class="me-3 position-relative">
+                        <a href="#" onclick="mostrarCarrito()" class="text-dark">
+                            <i class="fas fa-shopping-cart fa-lg"></i>
+                            <span class="cart-counter" id="carrito-cantidad" >0</span>
                         </a>
                     </div>
                     <div id="carrito-panel" style="display:none; position:fixed; right:20px; top:60px; background:white; border:1px solid #ccc; padding:10px; z-index:1000;">
+                        <button id="cerrar-carrito" style="position:absolute; top:8px; right:8px; background:none; border:none; font-size:1.2rem; cursor:pointer;">✖</button>
                         <h3>🛒 Carrito <span id="carrito-cantidad"></span></h3>
                         <ul id="carrito-lista"></ul>
                         <p>Total: $<span id="total">0</span></p>
                         <button onclick="vaciarCarrito()">Vaciar carrito</button>
                         <button onclick="irACheckout()">Finalizar compra</button>
-                    </div>      
-                    <button class="mobile-menu-btn">☰</button>
+                    </div> 
+                    <div class="dropdown">
+                        <a href="#" class="text-dark dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle fa-lg"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if user.is_authenticated %}
+                                <li><span class="dropdown-item-text">Bienvenido, {{ user.username }}!</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">Mi perfil</a></li>
+                                {% if user.is_staff %}
+                                    <li><a class="dropdown-item" href="#">Administrar productos</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'login' %}">Iniciar sesión</a></li>
+                                <li><a class="dropdown-item" href="{% url 'registro' %}">Registrarse</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
             </div>
-            {% if request.user.is_authenticated %}
-            <h1>Bienvenido, {{ request.user.username }}!</h1>
-            <a href="{% url 'logout' %}">Cerrar sesión</a>
-            {% else %}
-            <p>No has iniciado sesión. <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
-            {% endif %}
-            <nav>
-                <ul>
-                    <li><a href="{% url 'inicio' %}">Inicio</a></li>
-                    <li><a href="{% url 'lista_productos' %}">Herramientas</a></li>
-                    <li><a href="#">Materiales</a></li>
-                    <li><a href="#">Electricidad</a></li>
-                    <li><a href="#">Plomería</a></li>
-                    <li><a href="#">Construcción</a></li>
-                    <li><a href="#">Ofertas</a></li>
-                    <li><a href="{% url 'contacto' %}">Contacto</a></li>
-                </ul>
-            </nav>
         </div>
+    </nav>
+        
     </header>
     {% block content %}
     <!-- Hero Banner -->
@@ -409,4 +437,10 @@
             // Redirigir a una página de checkout (opcional)
             window.location.href = '/checkout/'  // si decides crear esta vista
         }
+        document.getElementById('cerrar-carrito').onclick = function() {
+            document.getElementById('carrito-panel').style.display = 'none';
+        };
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+</body>
