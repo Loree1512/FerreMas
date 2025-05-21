@@ -36,17 +36,21 @@ class Orden(models.Model):
     email = models.EmailField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
     fecha = models.DateTimeField(auto_now_add=True)
-
+    paypal_payment_id = models.CharField(max_length=255, blank=True, null=True)
+    fecha_pago = models.DateTimeField(blank=True, null=True)
     ESTADOS = [
         ('pendiente', 'Pendiente'),
         ('preparando', 'Preparando'),
         ('entregado_a_vendedor', 'Entregado a vendedor'),
         ('entregado_a_cliente', 'Entregado a cliente'),
+        ('completado', 'Completado por bodega'),
+        ('validado', 'Validado por contador'),
+        ('rechazada', 'Rechazada'),
     ]
     estado = models.CharField(max_length=30, choices=ESTADOS, default='pendiente')
 
     metodo_pago = models.CharField(max_length=30, default='paypal')  # o 'transferencia'
-
+    aceptado_por_vendedor = models.BooleanField(default=False)
     def __str__(self):
         return f'Orden #{self.id} - {self.nombre_cliente}'
     
@@ -56,4 +60,5 @@ class ItemOrden(models.Model):
     cantidad = models.IntegerField()
 
     def __str__(self):
-        return f'{self.producto.nombre} x {self.cantidad}'
+        nombre_producto = self.producto.nombre if self.producto else 'Producto eliminado'
+        return f'{nombre_producto} x {self.cantidad}'

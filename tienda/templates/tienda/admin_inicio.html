@@ -22,6 +22,31 @@
     </li>
     {% endfor %}
     </ul>
+    <h2>Órdenes Recientes</h2>
 
+    {% for orden in ordenes %}
+        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+            <p><strong>Cliente:</strong> {{ orden.nombre_cliente }} ({{ orden.email }})</p>
+            <p><strong>Fecha:</strong> {{ orden.fecha }}</p>
+            <p><strong>Total:</strong> ${{ orden.total }}</p>
+            <p><strong>Estado:</strong> {{ orden.get_estado_display }}</p>
+
+            <ul>
+                {% for item in orden.items.all %}
+                    <li>{{ item.producto.nombre }} x{{ item.cantidad }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if orden.estado == 'pendiente' %}
+                <form method="post" action="{% url 'procesar_orden' orden.id %}">
+                    {% csrf_token %}
+                    <button type="submit" name="accion" value="aceptar">Aceptar</button>
+                    <button type="submit" name="accion" value="rechazar">Rechazar</button>
+                </form>
+            {% else %}
+                <p><em>Esta orden ya ha sido procesada.</em></p>
+            {% endif %}
+        </div>
+    {% endfor %}
     <a href="{% url 'logout' %}">Cerrar sesión</a>
 {% endblock %}

@@ -1,40 +1,35 @@
 {% extends 'tienda/inicio.html' %}
 {% block content %}
-<h2>Panel Bodeguero</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Cliente</th>
-            <th>Total</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for orden in ordenes %}
-        <tr>
-            <td>{{ orden.nombre_cliente }}</td>
-            <td>${{ orden.total }}</td>
-            <td>{{ orden.fecha }}</td>
-            <td>{{ orden.estado }}</td>
-            <td>
-                {% if orden.estado == 'pendiente' %}
-                <form method="post" action="{% url 'actualizar_estado_orden' orden.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="nuevo_estado" value="preparando">
-                    <button type="submit">Preparar</button>
-                </form>
-                {% elif orden.estado == 'preparando' %}
-                <form method="post" action="{% url 'actualizar_estado_orden' orden.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="nuevo_estado" value="entregado_a_vendedor">
-                    <button type="submit">Entregar a Vendedor</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<h2>Órdenes en preparación</h2>
+
+{% for orden in ordenes %}
+  <div>
+    <h4>Cliente: {{ orden.nombre_cliente }}</h4>
+    <p>Fecha: {{ orden.fecha }}</p>
+    <p>Total: ${{ orden.total }}</p>
+    <ul>
+      {% for item in orden.items.all %}
+        <li>{{ item.producto.nombre }} x{{ item.cantidad }}</li>
+      {% endfor %}
+    </ul>
+    <p><strong>Estado actual:</strong> "{{ orden.estado }}"</p>
+
+    {% if orden.estado == 'pendiente' %}
+      <form method="post" action="{% url 'actualizar_estado_bodega' orden.id %}">
+        {% csrf_token %}
+        <button name="nuevo_estado" value="preparando">Marcar como En Preparación</button>
+      </form>
+    {% elif orden.estado == 'preparando' %}
+      <form method="post" action="{% url 'actualizar_estado_bodega' orden.id %}">
+        {% csrf_token %}
+        <button name="nuevo_estado" value="entregado_a_vendedor">Marcar como Entregado a Vendedor</button>
+      </form>
+    {% elif orden.estado == 'completado' %}
+      <p><em>Orden completada</em></p>
+    {% endif %}
+  </div>
+  <hr>
+{% empty %}
+  <p>No hay órdenes por preparar.</p>
+{% endfor %}
 {% endblock %}
