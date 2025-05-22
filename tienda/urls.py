@@ -26,6 +26,9 @@ urlpatterns = [
     path('panel/ordenes/', views.admin_ordenes_view, name='admin_ordenes'),
     path('buscar/', views.buscar_productos, name='buscar_productos'),
     path('checkout/datos/', views.formulario_cliente, name='formulario_cliente'),
+    path('bodeguero/productos/', views.bodeguero_productos, name='bodeguero_productos'),
+    path('bodeguero/ordenes/', views.ordenes_bodeguero, name='bodeguero_ordenes'),
+    path('admin/usuarios/', views.crear_usuario, name='admin_usuarios'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

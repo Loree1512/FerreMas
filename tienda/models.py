@@ -16,9 +16,8 @@ class Perfil(models.Model):
 class Producto(models.Model):
     CATEGORIAS = [
         ('manuales', 'Herramientas manuales'),
-        ('materiales', 'Materiales'),
         ('electronica', 'Electricidad'),
-        ('plomeria', 'Plomería'),('construcción', 'Construcción'),
+        ('plomeria', 'Plomería'),('construccion', 'Construccion'),
          
     ]
     
@@ -37,6 +36,8 @@ class Orden(models.Model):
     email = models.EmailField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
     fecha = models.DateTimeField(auto_now_add=True)
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    sucursal = models.CharField(max_length=100, blank=True, null=True)
     paypal_payment_id = models.CharField(max_length=255, blank=True, null=True)
     fecha_pago = models.DateTimeField(blank=True, null=True)
     ESTADOS = [

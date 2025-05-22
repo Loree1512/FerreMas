@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 import json
 from django.utils import timezone
+from django.contrib.auth.decorators import user_passes_test
 # Create your views here.
 
 
@@ -184,6 +185,8 @@ def registrar_orden(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            direccion = data.get('direccion')
+            sucursal = data.get('sucursal')
             carrito = data.get('carrito', [])
             total = data.get('total')
             nombre = data.get('nombre')
@@ -299,3 +302,38 @@ def buscar_productos(request):
     query = request.GET.get('q', '')
     resultados = Producto.objects.filter(nombre__icontains=query) if query else []
     return render(request, 'tienda/busqueda.html', {'resultados': resultados, 'query': query})
+
+def ordenes_bodeguero(request):
+    ordenes = Orden.objects.filter(estado__in=['pendiente', 'preparando', 'completado']).order_by('-fecha')
+    return render(request, 'tienda/bodeguero_ordenes.html', {'ordenes': ordenes})
+
+def bodeguero_productos(request):
+    # Mostrar productos existentes
+    productos = Producto.objects.all().order_by('-id')
+    # Formulario para agregar producto
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            # Puedes agregar un mensaje de éxito aquí
+    else:
+        form = ProductoForm()
+    return render(request, 'tienda/bodeguero_productos.html', {
+        'form': form,
+        'productos': productos
+    })
+
+@user_passes_test(lambda u: u.is_superuser)
+def crear_usuario(request):
+    if request.method == 'POST':
+        form = CrearUsuarioForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            form.cleaned_data['grupos'].set(user.groups)
+            user.groups.set(form.cleaned_data['grupos'])
+            return redirect('admin_inicio')
+    else:
+        form = CrearUsuarioForm()
+    return render(request, 'tienda/admin_usuarios.html', {'form': form})

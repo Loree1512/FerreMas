@@ -59,6 +59,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfedr3syURuP6LBv3Jg_FrRhO4Dy-DL2Y&libraries=places"></script>
 <script src="https://www.paypal.com/sdk/js?client-id=AeLEkESeZIbdS-FcliNZs4SgCfikmrh3GrRIX19F5hlaYpMdtO12JeEtvpiX077IHu9wHIeuO9k52jYG&currency=USD"></script>
 <script>
+
 function toggleDireccion() {
     const opcion = document.getElementById('opcion-despacho').value;
     const grupoDireccion = document.getElementById('direccion-group');
@@ -159,9 +160,12 @@ document.getElementById('pago-paypal-btn').onclick = function() {
         },
         onApprove: function(data, actions) {
             return actions.order.capture().then(function(details) {
+            guardarPedido('paypal', function() {
                 alert('Pago realizado con éxito. ¡Gracias por tu compra!');
-                document.getElementById('form-cliente').submit();
+                localStorage.removeItem('carrito');
+                window.location.href = '/'; // o a una página de éxito
             });
+        });
         },
         onError: function(err) {
             alert('Ocurrió un error con PayPal');
@@ -179,8 +183,37 @@ document.getElementById('pago-transferencia-btn').onclick = function() {
 
 // Finalizar pedido por transferencia
 function finalizarTransferencia() {
-    alert('Pedido registrado. Recuerda enviar el comprobante de transferencia.');
-    document.getElementById('form-cliente').submit();
+    guardarPedido('transferencia', function() {
+        alert('Pedido registrado. Recuerda enviar el comprobante de transferencia.');
+        localStorage.removeItem('carrito');
+        window.location.href = '/'; // o a una página de éxito
+    });
+}
+function guardarPedido(metodo_pago, callback) {
+    const nombre = document.getElementById('nombre').value;
+    const email = document.getElementById('email').value;
+    const opcion = document.getElementById('opcion-despacho').value;
+    const direccion = document.getElementById('direccion').value;
+    const sucursal = document.getElementById('sucursal').value;
+    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    fetch('/api/orden/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            nombre: nombre,
+            email: email,
+            opcion_despacho: opcion,
+            direccion: direccion,
+            sucursal: sucursal,
+            carrito: carrito,
+            total: total,
+            metodo_pago: metodo_pago
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (callback) callback(data);
+    });
 }
 </script>
 {% endblock %}

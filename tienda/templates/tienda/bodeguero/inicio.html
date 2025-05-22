@@ -2,34 +2,51 @@
 {% block content %}
 <h2>Órdenes en preparación</h2>
 
-{% for orden in ordenes %}
-  <div>
-    <h4>Cliente: {{ orden.nombre_cliente }}</h4>
-    <p>Fecha: {{ orden.fecha }}</p>
-    <p>Total: ${{ orden.total }}</p>
-    <ul>
-      {% for item in orden.items.all %}
-        <li>{{ item.producto.nombre }} x{{ item.cantidad }}</li>
-      {% endfor %}
-    </ul>
-    <p><strong>Estado actual:</strong> "{{ orden.estado }}"</p>
-
-    {% if orden.estado == 'pendiente' %}
-      <form method="post" action="{% url 'actualizar_estado_bodega' orden.id %}">
-        {% csrf_token %}
-        <button name="nuevo_estado" value="preparando">Marcar como En Preparación</button>
-      </form>
-    {% elif orden.estado == 'preparando' %}
-      <form method="post" action="{% url 'actualizar_estado_bodega' orden.id %}">
-        {% csrf_token %}
-        <button name="nuevo_estado" value="entregado_a_vendedor">Marcar como Entregado a Vendedor</button>
-      </form>
-    {% elif orden.estado == 'completado' %}
-      <p><em>Orden completada</em></p>
-    {% endif %}
-  </div>
-  <hr>
-{% empty %}
-  <p>No hay órdenes por preparar.</p>
-{% endfor %}
+<div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i> Pedidos existentes</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Productos</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orden in ordenes %}
+                        <tr>
+                            <td>{{ orden.nombre_cliente }} ({{ orden.email }})</td>
+                            <td>{{ orden.fecha }}</td>
+                            <td>${{ orden.total }}</td>
+                            <td>{{ orden.get_estado_display }}</td>
+                            <td>
+                                <ul class="mb-0">
+                                    {% for item in orden.items.all %}
+                                        <li>{{ item.producto.nombre }} x{{ item.cantidad }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                {% if orden.estado == 'pendiente' %}
+                                    <form method="post" action="{% url 'procesar_orden' orden.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" name="accion" value="aceptar">Aceptar</button>
+                                        <button type="submit" name="accion" value="rechazar">Rechazar</button>
+                                    </form>
+                                {% else %}
+                                    <em>Procesada</em>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

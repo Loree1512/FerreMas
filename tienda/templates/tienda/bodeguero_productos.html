@@ -8,18 +8,15 @@
         <div class="col-lg-3 mb-4">
             <div class="admin-nav">
                 <div class="p-4 border-bottom">
-                    <h5 class="m-0">Panel de Administrador</h5>
+                    <h5 class="m-0">Panel de Bodeguero</h5>
                     <small class="text-muted">Bienvenido, {{ request.user.username }}!</small>
                 </div>
                 <div class="list-group list-group-flush">
-                    <a href="{% url 'admin_inicio' %}" class="list-group-item list-group-item-action active">
+                    <a href="{% url 'bodeguero_productos' %}" class="list-group-item list-group-item-action active">
                         <i class="fas fa-box-open me-2"></i> Productos
                     </a>
-                    <a href="{% url 'admin_ordenes' %}" class="list-group-item list-group-item-action">
+                    <a href="{% url 'bodeguero_ordenes' %}" class="list-group-item list-group-item-action">
                         <i class="fas fa-shopping-cart me-2"></i> Pedidos
-                    </a>
-                    <a href="{% url 'admin_usuarios' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-users me-2"></i> Usuarios
                     </a>
                     
                 </div>

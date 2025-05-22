@@ -1,0 +1,9 @@
+{% extends 'tienda/inicio.html' %}
+{% block content %}
+<h2>Crear usuario</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Crear usuario</button>
+</form>
+{% endblock %}
