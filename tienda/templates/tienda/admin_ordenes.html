@@ -1,0 +1,75 @@
+{% extends "tienda/inicio.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Barra lateral de navegación administrativa -->
+        <div class="col-lg-3 mb-4">
+            <div class="admin-nav">
+                <div class="p-4 border-bottom">
+                    <h5 class="m-0">Panel de Administrador</h5>
+                    <small class="text-muted">Bienvenido, {{ request.user.username }}!</small>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'admin_inicio' %}" class="list-group-item list-group-item-action ">
+                        <i class="fas fa-box-open me-2"></i> Productos
+                    </a>
+                    <a href="{% url 'admin_ordenes' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-shopping-cart me-2"></i> Pedidos
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i> Usuarios
+                    </a>
+                    
+                </div>
+            </div>
+        </div>
+<div class="col-lg-9">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i> Productos existentes</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orden in ordenes %}
+                        <tr>
+                            <td>{{ orden.nombre_cliente }} ({{ orden.email }})</td>
+                            <td>{{ orden.fecha }}</td>
+                            <td>${{ orden.total }}</td>
+                            <td>{{ orden.get_estado_display }}</td>
+                        </tr>
+                        <ul>
+                {% for item in orden.items.all %}
+                    <li>{{ item.producto.nombre }} x{{ item.cantidad }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if orden.estado == 'pendiente' %}
+                <form method="post" action="{% url 'procesar_orden' orden.id %}">
+                    {% csrf_token %}
+                    <button type="submit" name="accion" value="aceptar">Aceptar</button>
+                    <button type="submit" name="accion" value="rechazar">Rechazar</button>
+                </form>
+            {% else %}
+                <p><em>Esta orden ya ha sido procesada.</em></p>
+            {% endif %}
+    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+    
+    </div>
+</div>
+    
+{% endblock %}

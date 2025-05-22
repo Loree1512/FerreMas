@@ -1,0 +1,186 @@
+{% extends "tienda/inicio.html" %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Datos del cliente y despacho</h2>
+    <form id="form-cliente">
+        <div class="mb-3">
+            <label for="opcion-despacho" class="form-label">Opción de despacho</label>
+            <select class="form-select" id="opcion-despacho" required onchange="toggleDireccion()">
+                <option value="">Selecciona una opción</option>
+                <option value="retiro">Retiro en tienda</option>
+                <option value="domicilio">Despacho a domicilio</option>
+            </select>
+        </div>
+        <div class="mb-3" id="sucursal-group" style="display:none;">
+            <label for="sucursal" class="form-label">Selecciona sucursal</label>
+            <select class="form-select" id="sucursal">
+                <option value="">Selecciona una sucursal</option>
+                <option value="sucursal1">Sucursal 1 - Dirección 1</option>
+                <option value="sucursal2">Sucursal 2 - Dirección 2</option>
+                <option value="sucursal3">Sucursal 3 - Dirección 3</option>
+            </select>
+        </div>
+        <div class="mb-3" id="direccion-group" style="display:none;">
+            <label for="direccion" class="form-label">Dirección de despacho</label>
+            <input type="text" class="form-control" id="direccion" placeholder="Ingresa tu dirección">
+            <div id="map" style="height: 250px; width: 100%; margin-top: 10px; border-radius: 8px; display: none;"></div>
+        </div>
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre completo</label>
+            <input type="text" class="form-control" id="nombre" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'checkout' %}" class="btn btn-outline-secondary">Volver al resumen</a>
+            <button type="submit" class="btn btn-success" id="continuar-pago-btn">Continuar al pago</button>
+        </div>
+        <div id="opciones-pago" style="display:none;" class="mt-4">
+            <h5>Selecciona método de pago:</h5>
+            <button type="button" class="btn btn-primary me-2" id="pago-paypal-btn">PayPal</button>
+            <button type="button" class="btn btn-outline-secondary" id="pago-transferencia-btn">Transferencia bancaria</button>
+            <div id="paypal-button-container" class="mt-3"></div>
+            <div id="transferencia-info" class="mt-3" style="display:none;">
+                <div class="alert alert-info">
+                    <strong>Datos para transferencia:</strong><br>
+                    Banco: Banco Ejemplo<br>
+                    Cuenta: 123456789<br>
+                    Titular: FerreMas<br>
+                    Correo: contacto@ferremas.cl<br>
+                    <span class="text-muted">Envía el comprobante a nuestro correo para procesar tu pedido.</span>
+                </div>
+                <button type="button" class="btn btn-success" onclick="finalizarTransferencia()">Finalizar pedido</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfedr3syURuP6LBv3Jg_FrRhO4Dy-DL2Y&libraries=places"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AeLEkESeZIbdS-FcliNZs4SgCfikmrh3GrRIX19F5hlaYpMdtO12JeEtvpiX077IHu9wHIeuO9k52jYG&currency=USD"></script>
+<script>
+function toggleDireccion() {
+    const opcion = document.getElementById('opcion-despacho').value;
+    const grupoDireccion = document.getElementById('direccion-group');
+    const direccionInput = document.getElementById('direccion');
+    const grupoSucursal = document.getElementById('sucursal-group');
+    if (opcion === 'domicilio') {
+        grupoDireccion.style.display = 'block';
+        direccionInput.required = true;
+        grupoSucursal.style.display = 'none';
+        setTimeout(initAutocomplete, 200);
+    } else if (opcion === 'retiro') {
+        grupoDireccion.style.display = 'none';
+        direccionInput.required = false;
+        direccionInput.value = '';
+        grupoSucursal.style.display = 'block';
+    } else {
+        grupoDireccion.style.display = 'none';
+        direccionInput.required = false;
+        direccionInput.value = '';
+        grupoSucursal.style.display = 'none';
+    }
+}
+
+let autocomplete;
+function initAutocomplete() {
+    const direccionInput = document.getElementById('direccion');
+    if (direccionInput && typeof google !== "undefined") {
+        autocomplete = new google.maps.places.Autocomplete(direccionInput, {
+            types: ['address'],
+            componentRestrictions: { country: "cl" }
+        });
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            if (place.geometry && place.geometry.location) {
+                mostrarMapa(place.geometry.location.lat(), place.geometry.location.lng());
+            }
+        });
+    }
+}
+
+let map, marker;
+function mostrarMapa(lat, lng) {
+    const mapDiv = document.getElementById('map');
+    mapDiv.style.display = 'block';
+    const position = { lat: lat, lng: lng };
+    if (!map) {
+        map = new google.maps.Map(mapDiv, {
+            center: position,
+            zoom: 16
+        });
+        marker = new google.maps.Marker({
+            position: position,
+            map: map
+        });
+    } else {
+        map.setCenter(position);
+        marker.setPosition(position);
+    }
+}
+
+// Validación y mostrar opciones de pago
+let total = 0;
+const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+carrito.forEach(item => {
+    total += item.precio * item.cantidad;
+});
+total = total.toFixed(2);
+
+document.getElementById('form-cliente').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const opcion = document.getElementById('opcion-despacho').value;
+    const direccion = document.getElementById('direccion').value;
+    const sucursal = document.getElementById('sucursal').value;
+    if (opcion === 'domicilio' && !direccion) {
+        document.getElementById('direccion').focus();
+        alert('Debes ingresar tu dirección para despacho a domicilio.');
+        return false;
+    }
+    if (opcion === 'retiro' && !sucursal) {
+        document.getElementById('sucursal').focus();
+        alert('Debes seleccionar una sucursal para retiro en tienda.');
+        return false;
+    }
+    document.getElementById('continuar-pago-btn').style.display = 'none';
+    document.getElementById('opciones-pago').style.display = 'block';
+});
+
+// Botón PayPal
+document.getElementById('pago-paypal-btn').onclick = function() {
+    document.getElementById('paypal-button-container').innerHTML = '';
+    paypal.Buttons({
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: { value: total }
+                }]
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                alert('Pago realizado con éxito. ¡Gracias por tu compra!');
+                document.getElementById('form-cliente').submit();
+            });
+        },
+        onError: function(err) {
+            alert('Ocurrió un error con PayPal');
+            console.error(err);
+        }
+    }).render('#paypal-button-container');
+    document.getElementById('transferencia-info').style.display = 'none';
+};
+
+// Botón Transferencia
+document.getElementById('pago-transferencia-btn').onclick = function() {
+    document.getElementById('paypal-button-container').innerHTML = '';
+    document.getElementById('transferencia-info').style.display = 'block';
+};
+
+// Finalizar pedido por transferencia
+function finalizarTransferencia() {
+    alert('Pedido registrado. Recuerda enviar el comprobante de transferencia.');
+    document.getElementById('form-cliente').submit();
+}
+</script>
+{% endblock %}

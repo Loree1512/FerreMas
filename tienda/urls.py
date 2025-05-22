@@ -22,6 +22,10 @@ urlpatterns = [
     path('orden/<int:orden_id>/procesar/', views.procesar_orden, name='procesar_orden'),
     path('orden/actualizar/<int:orden_id>/', views.actualizar_estado_bodega, name='actualizar_estado_bodega'),
     path('orden/validar/<int:orden_id>/', views.actualizar_estado_contador, name='actualizar_estado_contador'),
+    path('producto/eliminar/<int:pk>/', views.eliminar_producto, name='eliminar_producto'),
+    path('panel/ordenes/', views.admin_ordenes_view, name='admin_ordenes'),
+    path('buscar/', views.buscar_productos, name='buscar_productos'),
+    path('checkout/datos/', views.formulario_cliente, name='formulario_cliente'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

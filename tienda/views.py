@@ -25,24 +25,15 @@ def inicio_view(request):
 
 @login_required
 def admin_inicio_view(request):
-    if not request.user.is_staff and not request.user.is_superuser:
-        return redirect('inicio')
-    
-    # Procesamiento del formulario de productos
-    if request.method == 'POST' and 'agregar_producto' in request.POST:
+    if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('admin_inicio')
+            return redirect('admin_inicio')  # Cambia por el nombre de tu URL
     else:
         form = ProductoForm()
-
-    # Carga de productos
     productos = Producto.objects.all()
-
-    # Carga de órdenes
-    ordenes = Orden.objects.all().order_by('-fecha')
-
+    ordenes = Orden.objects.all()
     return render(request, 'tienda/admin_inicio.html', {
         'form': form,
         'productos': productos,
@@ -177,10 +168,14 @@ def login_view(request):
 
 def productos_por_categoria(request, categoria):
     productos = Producto.objects.filter(categoria=categoria)
+    nombre_categoria = dict(Producto.CATEGORIAS).get(categoria, categoria.title())
     return render(request, 'tienda/productos_categoria.html', {
         'productos': productos,
-        'categoria_actual': categoria
+        'nombre_categoria': nombre_categoria,
     })
+
+def formulario_cliente(request):
+    return render(request, 'tienda/formulario_cliente.html')
 @csrf_exempt
 
 #REGISTRO ORDEN COMPRA
@@ -286,3 +281,21 @@ def actualizar_estado_contador(request, orden_id):
             orden.estado = nuevo_estado
             orden.save()
     return redirect('contador_inicio')
+
+
+def eliminar_producto(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    producto.delete()
+    return redirect('admin_inicio') 
+
+def admin_ordenes_view(request):
+    if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+        ordenes = Orden.objects.all()
+        return render(request, 'tienda/admin_ordenes.html', {'ordenes': ordenes})
+    else:
+        return redirect('login')
+
+def buscar_productos(request):
+    query = request.GET.get('q', '')
+    resultados = Producto.objects.filter(nombre__icontains=query) if query else []
+    return render(request, 'tienda/busqueda.html', {'resultados': resultados, 'query': query})

@@ -24,26 +24,26 @@
                         <a class="nav-link" href="{% url 'inicio' %}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'lista_productos' %}">Herramientas</a>
+                        <a class="nav-link" href="{% url 'lista_productos' %}">Productos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Materiales</a>
+                        <a class="nav-link" href="{% url 'productos_categoria' categoria='manuales' %}">H. Manuales</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Electricidad</a>
+                        <a class="nav-link" href="{% url 'productos_categoria' categoria='electronica' %}">H. Electricas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Plomería</a>
+                        <a class="nav-link" href="{% url 'productos_categoria' categoria='plomeria' %}">Plomería</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Construcción</a>
+                        <a class="nav-link" href="{% url 'productos_categoria' categoria='materiales' %}">Construcción</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'contacto' %}">Contacto</a>
                     </li>
                 </ul>
-                <form class="d-flex me-3">
-                    <input class="form-control me-2" type="search" placeholder="Buscar productos...">
+                <form class="d-flex me-3" method="get" action="{% url 'buscar_productos' %}">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Buscar productos...">
                     <button class="btn btn-outline-secondary" type="submit">
                         <i class="fas fa-search"></i>
                     </button>
@@ -55,13 +55,15 @@
                             <span class="cart-counter" id="carrito-cantidad" >0</span>
                         </a>
                     </div>
-                    <div id="carrito-panel" style="display:none; position:fixed; right:20px; top:60px; background:white; border:1px solid #ccc; padding:10px; z-index:1000;">
-                        <button id="cerrar-carrito" style="position:absolute; top:8px; right:8px; background:none; border:none; font-size:1.2rem; cursor:pointer;">✖</button>
+                    <div id="carrito-panel" style="display:none; position:fixed; right:20px; top:60px; background:white; border:1px solid #ccc; padding:10px; z-index:1000; min-width:320px;">
+                         <button id="cerrar-carrito" style="position:absolute; top:8px; right:8px; background:none; border:none; font-size:1.2rem; cursor:pointer;">✖</button>
                         <h3>🛒 Carrito <span id="carrito-cantidad"></span></h3>
-                        <ul id="carrito-lista"></ul>
-                        <p>Total: $<span id="total">0</span></p>
-                        <button onclick="vaciarCarrito()">Vaciar carrito</button>
-                        <button onclick="irACheckout()">Finalizar compra</button>
+                        <ul id="carrito-lista" class="list-group mb-3"></ul>
+                         <p class="fw-bold">Total: $<span id="total">0</span></p>
+                         <div class="d-flex gap-2">
+                             <button onclick="vaciarCarrito()" class="btn btn-outline-danger btn-sm w-100">Vaciar carrito</button>
+                            <button onclick="irACheckout()" class="btn btn-success btn-sm w-100">Finalizar compra</button>
+                        </div>
                     </div> 
                     <div class="dropdown">
                         <a href="#" class="text-dark dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown">
@@ -72,8 +74,8 @@
                                 <li><span class="dropdown-item-text">Bienvenido, {{ user.username }}!</span></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#">Mi perfil</a></li>
-                                {% if user.is_staff %}
-                                    <li><a class="dropdown-item" href="#">Administrar productos</a></li>
+                                {% if user.is_superuser %}
+                                    <li><a class="dropdown-item" href="{% url 'admin_inicio' %}">Administrar productos</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
@@ -85,27 +87,6 @@
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
-=======
-            {% if request.user.is_authenticated %}
-            <h1>Bienvenido, {{ request.user.username }}!</h1>
-            <a href="{% url 'logout' %}">Cerrar sesión</a>
-            {% else %}
-            <p>No has iniciado sesión. <a href="{% url 'login' %}" style="color: blue; text-decoration: underline;">Inicia sesión aquí</a></p>
-            {% endif %}
-            <nav>
-                <ul>
-                    <li><a href="{% url 'inicio' %}">Inicio</a></li>
-                    <li><a href="{% url 'lista_productos' %}">Productos</a></li>
-                    <li><a href="{% url 'productos_categoria' categoria='manuales' %}">Herramienta Manuales</a></li>
-                    <li><a href="{% url 'productos_categoria' categoria='electronica' %}">Herramientas Elec.</a></li>
-                    <li><a href="{% url 'productos_categoria' categoria='plomeria' %}">Plomería</a></li>
-                    <li><a href="{% url 'productos_categoria' categoria='materiales' %}">Materiales de Construcción</a></li>
-                    <li><a href="#">Ofertas</a></li>
-                    <li><a href="{% url 'contacto' %}">Contacto</a></li>
-                </ul>
-            </nav>
->>>>>>> 7e3731b0775a1bddfcb39d7273a862ec6f86d8bd
         </div>
     </nav>
         

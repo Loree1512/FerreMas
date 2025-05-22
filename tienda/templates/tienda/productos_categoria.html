@@ -2,7 +2,7 @@
 
 {% block content %}
 <section class="container products-section" style="margin-top: 40px; margin-bottom: 40px;">
-    <h2 class="titulo-categoria">Productos de Electrónica</h2>
+    <h2 class="titulo-categoria">Productos de {{ nombre_categoria }}</h2>
         <div class="products-grid">
             {% for producto in productos %}
                 <div class="product-card">

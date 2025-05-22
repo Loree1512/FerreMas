@@ -1,71 +1,169 @@
 {% extends "tienda/inicio.html" %}
-
 {% block content %}
-    <script src="https://www.paypal.com/sdk/js?client-id=AeLEkESeZIbdS-FcliNZs4SgCfikmrh3GrRIX19F5hlaYpMdtO12JeEtvpiX077IHu9wHIeuO9k52jYG&currency=USD"></script>
+<div class="container py-5">
+    <h2 class="mb-4">Resumen de tu compra</h2>
+    <div class="table-responsive mb-4">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="checkout-lista"></tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-end mb-4">
+        <h4>Total: $<span id="checkout-total">0</span></h4>
+    </div>
+    <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'lista_productos' %}" class="btn btn-outline-secondary">Seguir comprando</a>
+        <a href="{% url 'formulario_cliente' %}" class="btn btn-primary" id="continuar-btn">Continuar</a>
+    </div>
+</div>
 
-    <h1>Resumen de tu compra</h1>
-    <ul id="checkout-lista"></ul>
-    <p><strong>Total: $<span id="checkout-total">0</span></strong></p>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfedr3syURuP6LBv3Jg_FrRhO4Dy-DL2Y&libraries=places"></script>
+<script>
+const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+const lista = document.getElementById('checkout-lista');
+const totalElemento = document.getElementById('checkout-total');
 
-    <div id="paypal-button-container"></div>
-    <script>
-        const carrito = JSON.parse(localStorage.getItem('carrito')) || []
+function renderCarrito() {
+    lista.innerHTML = '';
+    let total = 0;
+    carrito.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.nombre}</td>
+            <td>
+                <div class="input-group input-group-sm" style="max-width:120px;">
+                    <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad(${idx}, -1)">-</button>
+                    <input type="number" min="1" class="form-control text-center" value="${item.cantidad}" onchange="setCantidad(${idx}, this.value)">
+                    <button class="btn btn-outline-secondary" type="button" onclick="cambiarCantidad(${idx}, 1)">+</button>
+                </div>
+            </td>
+            <td>$${item.precio.toFixed(2)}</td>
+            <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="eliminarItem(${idx})"><i class="fas fa-trash"></i></button>
+            </td>
+        `;
+        lista.appendChild(tr);
+        total += item.precio * item.cantidad;
+    });
+    totalElemento.innerText = total.toFixed(2);
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+}
+function cambiarCantidad(idx, delta) {
+    carrito[idx].cantidad = Math.max(1, carrito[idx].cantidad + delta);
+    renderCarrito();
+}
+function setCantidad(idx, value) {
+    const val = Math.max(1, parseInt(value) || 1);
+    carrito[idx].cantidad = val;
+    renderCarrito();
+}
+function eliminarItem(idx) {
+    carrito.splice(idx, 1);
+    renderCarrito();
+}
+renderCarrito();
 
-        const lista = document.getElementById('checkout-lista')
-        const totalElemento = document.getElementById('checkout-total')
+// Modal y paso a formulario
+document.getElementById('continuar-btn').onclick = function() {
+    if (carrito.length === 0) {
+        alert('El carrito está vacío.');
+        return;
+    }
+    var modal = new bootstrap.Modal(document.getElementById('clienteModal'));
+    modal.show();
+};
 
-        let total = 0
-        carrito.forEach(item => {
-            const li = document.createElement('li')
-            li.innerText = `${item.nombre} x${item.cantidad} - $${(item.precio * item.cantidad).toFixed(2)}`
-            lista.appendChild(li)
-            total += item.precio * item.cantidad
-        })
-        totalElemento.innerText = total.toFixed(2)
+// Mostrar u ocultar dirección según opción de despacho
+function toggleDireccion() {
+    const opcion = document.getElementById('opcion-despacho').value;
+    const grupoDireccion = document.getElementById('direccion-group');
+    if (opcion === 'domicilio') {
+        grupoDireccion.style.display = 'block';
+        document.getElementById('direccion').required = true;
+    } else {
+        grupoDireccion.style.display = 'none';
+        document.getElementById('direccion').required = false;
+    }
+}
 
-        // Renderizar botón de PayPal después de que todo esté listo
-        paypal.Buttons({
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: total.toFixed(2)
-                        },
-                        description: 'Compra en FerreMas'
-                    }]
-                });
-            },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    const nombre = details.payer.name.given_name
-                    const email = details.payer.email_address
+let autocomplete;
+function initAutocomplete() {
+    const direccionInput = document.getElementById('direccion');
+    if (direccionInput) {
+        autocomplete = new google.maps.places.Autocomplete(direccionInput, {
+            types: ['address'],
+            componentRestrictions: { country: "cl" } // Cambia "cl" por tu país si es necesario
+        });
+    }
+}
+document.addEventListener("DOMContentLoaded", function() {
+    if (document.getElementById('direccion')) {
+        initAutocomplete();
+    }
+});
 
-                    // Enviar orden al backend
-                    fetch('/api/orden/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            carrito: carrito,
-                            total: total.toFixed(2),
-                            nombre: nombre,
-                            email: email
-                        })
-                    }).then(() => {
-                        alert('Gracias por tu compra, ' + nombre + ' 🎉')
-                        localStorage.removeItem('carrito')
-                        window.location.href = '/'
+// PayPal solo se muestra tras completar el formulario
+document.getElementById('form-cliente').onsubmit = function(e) {
+    e.preventDefault();
+    // Oculta el modal
+    bootstrap.Modal.getInstance(document.getElementById('clienteModal')).hide();
+
+    // Muestra el botón de PayPal
+    document.getElementById('paypal-button-container').innerHTML = '';
+    const nombre = document.getElementById('nombre').value;
+    const email = document.getElementById('email').value;
+    const direccion = document.getElementById('direccion').value;
+    const despacho = document.getElementById('opcion-despacho').value;
+    const total = totalElemento.innerText;
+
+    paypal.Buttons({
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: { value: total },
+                    description: 'Compra en FerreMas'
+                }]
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                // Enviar orden al backend
+                fetch('/api/orden/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        carrito: carrito,
+                        total: total,
+                        nombre: nombre,
+                        email: email,
+                        direccion: direccion,
+                        despacho: despacho
                     })
-                })
-            },
-            onCancel: function(data) {
-                alert('Pago cancelado ❌');
-            },
-            onError: function(err) {
-                console.error('Error en el pago:', err);
-                alert('Ocurrió un error en el proceso de pago.');
-            }
-        }).render('#paypal-button-container');
-    </script>
+                }).then(() => {
+                    alert('Gracias por tu compra, ' + nombre + ' 🎉');
+                    localStorage.removeItem('carrito');
+                    window.location.href = '/';
+                });
+            });
+        },
+        onCancel: function(data) {
+            alert('Pago cancelado ❌');
+        },
+        onError: function(err) {
+            console.error('Error en el pago:', err);
+            alert('Ocurrió un error en el proceso de pago.');
+        }
+    }).render('#paypal-button-container');
+};
+</script>
+<script src="https://www.paypal.com/sdk/js?client-id=AeLEkESeZIbdS-FcliNZs4SgCfikmrh3GrRIX19F5hlaYpMdtO12JeEtvpiX077IHu9wHIeuO9k52jYG&currency=USD"></script>
 {% endblock %}
