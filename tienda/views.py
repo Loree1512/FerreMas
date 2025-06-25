@@ -214,11 +214,17 @@ def registrar_orden(request):
             for item in carrito:
                 try:
                     producto = Producto.objects.get(id=item['id'])
+                    cantidad = item['cantidad']
                     ItemOrden.objects.create(
                         orden=orden,
                         producto=producto,
-                        cantidad=item['cantidad']
+                        cantidad=cantidad
                     )
+                    if producto.stock >= cantidad:
+                        producto.stock -= cantidad
+                        producto.save()
+                    else:
+                        return JsonResponse({'error': f'No hay suficiente stock para {producto.nombre}'},status=400)
                 except Producto.DoesNotExist:
                     continue
 

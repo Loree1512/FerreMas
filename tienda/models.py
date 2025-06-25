@@ -27,6 +27,7 @@ class Producto(models.Model):
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
     disponible = models.BooleanField(default=True)
     categoria = models.CharField(max_length=30, choices=CATEGORIAS)
+    stock = models.PositiveIntegerField(default=0)
     def __str__(self):
         return self.nombre
 

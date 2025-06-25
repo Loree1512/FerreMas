@@ -1,10 +1,11 @@
 {% extends "tienda/inicio.html" %}
 {% block content %}
 <section class="container products-section" style="margin-top: 40px; margin-bottom: 40px;">
-        <div class="products-grid">
-            {% for producto in productos %}
-                <div class="product-card">
-                    <div class="product-image">
+    <div class="products-grid">
+        {% for producto in productos %}
+            <div class="product-card">
+                <a href="{% url 'detalle_producto' producto.id %}">
+                    <div class="product-image" style="cursor: pointer;">
                         {% if producto.es_nuevo %}
                             <span class="product-tag tag-new">Nuevo</span>
                         {% endif %}
@@ -17,29 +18,39 @@
                             <img src="/api/placeholder/250/200" alt="{{ producto.nombre }}">
                         {% endif %}
                     </div>
-                    <div class="product-details">
-                        <div class="product-category">{{ producto.descripcion }}</div>
-                        <h4 class="product-title">{{ producto.nombre }}</h4>
-                        <div class="product-price">
-                            <span class="current-price">${{ producto.precio }}</span>
-                            {% if producto.precio_anterior %}
-                                <span class="old-price">${{ producto.precio_anterior }}</span>
-                            {% endif %}
-                        </div>
-                        <button class="add-to-cart" data-id="{{ producto.id }}" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre|escapejs }}', {{ producto.precio }})">
+                </a>
+                <div class="product-details">
+                    <div class="product-category">{{ producto.descripcion }}</div>
+                    <h4 class="product-title">{{ producto.nombre }}</h4>
+                    <div class="product-price">
+                        <span class="current-price">${{ producto.precio }}</span>
+                        {% if producto.precio_anterior %}
+                            <span class="old-price">${{ producto.precio_anterior }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if producto.stock == 0 %}
+                        <button class="add-to-cart btn btn-secondary" disabled>
+                            <span class="cart-icon-btn">❌</span> Sin stock
+                        </button>
+                    {% else %}
+                        <button class="add-to-cart btn btn-primary"
+                            onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre|escapejs }}', {{ producto.precio }})">
                             <span class="cart-icon-btn">🛒</span> Añadir al carrito
                         </button>
-                    </div>
+                        {% if producto.stock <= 5 %}
+                            <small class="text-warning d-block mt-1">¡Quedan solo {{ producto.stock }}!</small>
+                        {% endif %}
+                    {% endif %}
                 </div>
-            {% empty %}
-                <div class="no-products">
-                    <p>No hay productos disponibles en esta categoría.</p>
-                </div>
-            {% endfor %}
-        </div>
-    </section>
-
-        
+            </div>
+        {% empty %}
+            <div class="no-products">
+                <p>No hay productos disponibles en esta categoría.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}
     <script>
         let carrito = JSON.parse(localStorage.getItem('carrito')) || []

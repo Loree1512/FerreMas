@@ -23,9 +23,16 @@
                 {% endif %}
             </div>
             <h3 class="text-success mb-4">Precio: ${{ producto.precio }}</h3>
+            <p><strong>Stock disponible:</strong> {{ producto.stock }}</p>
             <div class="d-flex gap-2 mb-4">
-                <button class="btn btn-primary" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})">
-                    <i class="fas fa-cart-plus me-1"></i> Agregar al carrito
+                <button class="btn btn-primary" 
+                        onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }},{{ producto.stock }})"
+                        {% if producto.stock == 0 %} disabled {% endif %}>
+                    {% if producto.stock == 0 %}
+                        Sin Stock
+                    {% else %}
+                        Agregar al carrito
+                    {% endif %}
                 </button>
                 <a href="{% url 'lista_productos' %}" class="btn btn-outline-secondary">Volver a productos</a>
             </div>
