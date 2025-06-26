@@ -59,8 +59,26 @@ def actualizar_estado_bodega(request, orden_id):
 
 @login_required
 def bodeguero_inicio(request):
-    ordenes = Orden.objects.filter(estado__in=['preparando', 'entregado_a_vendedor', 'completado']).order_by('-fecha')
+    if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'bodeguero':
+        return redirect('inicio')
+
+    ordenes = Orden.objects.filter(estado__in=[
+        'aceptado_por_vendedor',
+        'preparando',
+        'entregado_a_vendedor'
+    ]).order_by('-fecha')
+
     return render(request, 'tienda/bodeguero/inicio.html', {'ordenes': ordenes})
+
+@require_POST
+@login_required
+def limpiar_historial_bodeguero(request):
+    if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'bodeguero':
+        return redirect('inicio')
+
+    Orden.objects.filter(estado='entregado_a_vendedor').delete()
+    messages.success(request, "Historial limpiado correctamente.")
+    return redirect('bodeguero_inicio')
 
 @login_required
 def contador_inicio(request):
@@ -276,18 +294,40 @@ def actualizar_estado_orden(request, orden_id):
 
 
 
-@require_POST
+@login_required
 def procesar_orden(request, orden_id):
     orden = get_object_or_404(Orden, id=orden_id)
-    accion = request.POST.get('accion')
 
-    if accion == 'aceptar':
-        orden.estado = 'preparando'
-    elif accion == 'rechazar':
-        orden.estado = 'rechazada'
-    orden.save()
+    # Solo el vendedor puede aceptar o rechazar
+    if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'vendedor':
+        messages.error(request, "No tienes permiso para realizar esta acción.")
+        return redirect('inicio')
 
-    return redirect('admin_inicio')
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+        if accion == 'aceptar':
+            orden.estado = 'aceptado_por_vendedor'
+            orden.aceptado_por_vendedor = True
+            orden.save()
+            messages.success(request, 'Pedido aceptado y enviado al bodeguero.')
+        elif accion == 'rechazar':
+            orden.estado = 'rechazada'
+            orden.save()
+            messages.info(request, 'Pedido rechazado.')
+
+    return redirect('admin_inicio')  # o admin_ordenes, según tu lógica
+
+def redirect_panel_por_rol(user):
+    perfil = getattr(user, 'perfil', None)
+    if perfil:
+        if perfil.rol == 'vendedor':
+            return redirect('admin_inicio')      # Panel vendedor
+        elif perfil.rol == 'bodeguero':
+            return redirect('bodeguero_inicio')  # Panel bodeguero
+        elif perfil.rol == 'contador':
+            return redirect('contador_inicio')
+    # Por defecto
+    return redirect('inicio')
 
 @csrf_exempt
 @login_required
@@ -384,3 +424,51 @@ def actualizar_disponible(request, producto_id):
             estado = "disponible" if nuevo_valor else "no disponible"
             messages.success(request, f'Producto "{producto.nombre}" ahora está {estado}.')
     return redirect('admin_inicio')
+
+@login_required
+def actualizar_estado_bodega(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+
+    # Validación de rol bodeguero
+    if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'bodeguero':
+        messages.error(request, "No tienes permiso para realizar esta acción.")
+        return redirect('inicio')
+
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+
+        if accion == 'preparando' and orden.estado == 'aceptado_por_vendedor':
+            orden.estado = 'preparando'
+            orden.save()
+            messages.success(request, 'La orden ha sido marcada como "En preparación".')
+
+        elif accion == 'entregado' and orden.estado == 'preparando':
+            orden.estado = 'entregado_a_vendedor'
+            orden.save()
+            messages.success(request, 'La orden ha sido marcada como "Entregada a vendedor".')
+
+        else:
+            messages.warning(request, 'Acción inválida para el estado actual.')
+
+    return redirect('bodeguero_inicio')
+
+@login_required
+def actualizar_estado_vendedor(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+
+    # Validación de rol vendedor
+    if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'vendedor':
+        messages.error(request, "No tienes permiso para realizar esta acción.")
+        return redirect('inicio')
+
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+
+        if accion == 'entregado_cliente' and orden.estado == 'entregado_a_vendedor':
+            orden.estado = 'entregado_a_cliente'
+            orden.save()
+            messages.success(request, 'La orden ha sido marcada como "Entregada al cliente".')
+        else:
+            messages.warning(request, 'Acción no permitida en el estado actual.')
+
+    return redirect('admin_ordenes')  # O a la vista de vendedor

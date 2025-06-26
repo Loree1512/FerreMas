@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from tienda.views import actualizar_estado_bodega
 
 urlpatterns = [
     path('', views.inicio, name='inicio'),
@@ -31,6 +32,12 @@ urlpatterns = [
     path('admin/usuarios/', views.crear_usuario, name='admin_usuarios'),
     path('producto/<int:producto_id>/stock/', views.actualizar_stock, name='actualizar_stock'),
     path('producto/<int:producto_id>/disponible/', views.actualizar_disponible, name='actualizar_disponible'),
+    path('panel/bodeguero/orden/<int:orden_id>/actualizar/', views.actualizar_estado_bodega, name='actualizar_estado_bodega'),
+    path('panel/bodeguero/limpiar/', views.limpiar_historial_bodeguero, name='limpiar_historial_bodeguero'),
+    path('panel/vendedor/orden/<int:orden_id>/actualizar/', views.actualizar_estado_vendedor, name='actualizar_estado_vendedor'),
+
+
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

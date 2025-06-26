@@ -59,11 +59,23 @@
                                 {% if orden.estado == 'pendiente' %}
                                     <form method="post" action="{% url 'procesar_orden' orden.id %}">
                                         {% csrf_token %}
-                                        <button type="submit" name="accion" value="aceptar">Aceptar</button>
-                                        <button type="submit" name="accion" value="rechazar">Rechazar</button>
+                                        <button type="submit" name="accion" value="aceptar" class="btn btn-sm btn-success mb-1">Aceptar</button>
+                                        <button type="submit" name="accion" value="rechazar" class="btn btn-sm btn-danger">Rechazar</button>
                                     </form>
+                                
+                                {% elif orden.estado == 'entregado_a_vendedor' %}
+                                    <form method="post" action="{% url 'actualizar_estado_vendedor' orden.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" name="accion" value="entregado_cliente" class="btn btn-sm btn-primary">
+                                            Marcar como entregado a cliente
+                                        </button>
+                                    </form>
+                                
+                                {% elif orden.estado == 'entregado_a_cliente' %}
+                                    <span class="badge bg-success">Entregado al cliente</span>
+                                
                                 {% else %}
-                                    <em>Procesada</em>
+                                    <em>{{ orden.get_estado_display }}</em>
                                 {% endif %}
                             </td>
                         </tr>
