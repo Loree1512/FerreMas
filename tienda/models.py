@@ -28,6 +28,10 @@ class Producto(models.Model):
     disponible = models.BooleanField(default=True)
     categoria = models.CharField(max_length=30, choices=CATEGORIAS)
     stock = models.PositiveIntegerField(default=0)
+    def save(self, *args, **kwargs):
+        if self.stock == 0:
+            self.disponible = False
+        super().save(*args, **kwargs)
     def __str__(self):
         return self.nombre
 

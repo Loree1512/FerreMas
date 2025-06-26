@@ -343,3 +343,35 @@ def crear_usuario(request):
     else:
         form = CrearUsuarioForm()
     return render(request, 'tienda/admin_usuarios.html', {'form': form})
+
+
+def actualizar_stock(request, producto_id):
+    if request.method == 'POST':
+        producto = get_object_or_404(Producto, id=producto_id)
+        nuevo_stock = request.POST.get('stock')
+        try:
+            nuevo_stock = int(nuevo_stock)
+            if nuevo_stock >= 0:
+                producto.stock = nuevo_stock
+                producto.save()
+                messages.success(request, f'Stock actualizado a {nuevo_stock} para "{producto.nombre}".')
+            else:
+                messages.error(request, 'El stock debe ser un número positivo.')
+        except ValueError:
+            messages.error(request, 'Stock inválido.')
+
+    return redirect('admin_inicio')
+
+def actualizar_disponible(request, producto_id):
+    if request.method == 'POST':
+        producto = get_object_or_404(Producto, id=producto_id)
+        nuevo_valor = request.POST.get('disponible') == 'True'
+
+        if producto.stock == 0 and nuevo_valor:
+            messages.error(request, 'No puedes marcar como disponible un producto con stock 0.')
+        else:
+            producto.disponible = nuevo_valor
+            producto.save()
+            estado = "disponible" if nuevo_valor else "no disponible"
+            messages.success(request, f'Producto "{producto.nombre}" ahora está {estado}.')
+    return redirect('admin_inicio')

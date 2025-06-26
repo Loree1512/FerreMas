@@ -29,6 +29,8 @@ urlpatterns = [
     path('bodeguero/productos/', views.bodeguero_productos, name='bodeguero_productos'),
     path('bodeguero/ordenes/', views.ordenes_bodeguero, name='bodeguero_ordenes'),
     path('admin/usuarios/', views.crear_usuario, name='admin_usuarios'),
+    path('producto/<int:producto_id>/stock/', views.actualizar_stock, name='actualizar_stock'),
+    path('producto/<int:producto_id>/disponible/', views.actualizar_disponible, name='actualizar_disponible'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
