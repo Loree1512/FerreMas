@@ -6,7 +6,7 @@ from .models import Perfil
 @receiver(post_save, sender=User)
 def crear_perfil_usuario(sender, instance, created, **kwargs):
     if created:
-        Perfil.objects.create(user=instance, rol='vendedor')  # Puedes cambiar el rol por defecto
+        Perfil.objects.create(user=instance, rol='cliente')  # Puedes cambiar el rol por defecto
 
 @receiver(post_save, sender=User)
 def guardar_perfil_usuario(sender, instance, **kwargs):

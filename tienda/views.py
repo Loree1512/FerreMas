@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Producto, Orden, ItemOrden
+from .models import Producto, Orden, ItemOrden, Perfil
 from .forms import ProductoForm
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -106,11 +106,20 @@ def register_view(request):
             messages.error(request, 'El correo ya está registrado.')
             return redirect('registro')
 
-        # Esta función guarda el password de forma segura
-        User.objects.create_user(username=username, email=email, password=password)
+        # Crear usuario
+        user = User.objects.create_user(username=username, email=email, password=password)
+
+        # Crear o actualizar perfil con rol cliente
+        perfil, created = Perfil.objects.get_or_create(user=user)
+        if not created:
+            perfil.rol = 'cliente'
+            perfil.save()
+        else:
+            perfil.rol = 'cliente'
+            perfil.save()
 
         messages.success(request, 'Usuario registrado correctamente.')
-        return redirect('inicio')  # O redirige donde tú quieras
+        return redirect('inicio')
 
     return render(request, 'tienda/registro.html')
 
