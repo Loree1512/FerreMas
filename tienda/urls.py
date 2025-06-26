@@ -34,7 +34,13 @@ urlpatterns = [
     path('producto/<int:producto_id>/disponible/', views.actualizar_disponible, name='actualizar_disponible'),
     path('panel/bodeguero/orden/<int:orden_id>/actualizar/', views.actualizar_estado_bodega, name='actualizar_estado_bodega'),
     path('panel/bodeguero/limpiar/', views.limpiar_historial_bodeguero, name='limpiar_historial_bodeguero'),
+    path('historial/limpiar/', views.limpiar_historial_vendedor, name='limpiar_historial_vendedor'),
+    path('contador/historial/limpiar/', views.limpiar_historial_contador, name='limpiar_historial_contador'),
     path('panel/vendedor/orden/<int:orden_id>/actualizar/', views.actualizar_estado_vendedor, name='actualizar_estado_vendedor'),
+    path('contador/verificar/<int:orden_id>/', views.verificar_pago, name='verificar_pago'),
+    path('orden/validar/<int:orden_id>/', views.actualizar_estado_contador, name='actualizar_estado_contador'),
+
+
 
 
 

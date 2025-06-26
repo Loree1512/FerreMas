@@ -1,22 +1,53 @@
 {% extends 'tienda/inicio.html' %}
 {% block content %}
-<h2>Pagos confirmados vía PayPal</h2>
-
-{% for orden in ordenes %}
-  <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
-    <h4>Cliente: {{ orden.nombre_cliente }}</h4>
-    <p><strong>Fecha de pago:</strong> {{ orden.fecha_pago|date:"d/m/Y H:i" }}</p>
-    <p><strong>Email:</strong> {{ orden.email }}</p>
-    <p><strong>Total:</strong> ${{ orden.total }}</p>
-    <p><strong>ID de pago PayPal:</strong> {{ orden.paypal_payment_id }}</p>
-    <p><strong>Estado:</strong> {{ orden.estado }}</p>
-    <ul>
-      {% for item in orden.items.all %}
-        <li>{{ item.producto.nombre }} x{{ item.cantidad }}</li>
-      {% endfor %}
-    </ul>
-  </div>
-{% empty %}
-  <p>No hay pagos confirmados aún.</p>
-{% endfor %}
+<h2>Pagos a verificar</h2>
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Pago</th>
+                    <th>Estado</th>
+                    <th>Verificado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes %}
+                    <tr>
+                        <td>{{ orden.nombre_cliente }}</td>
+                        <td>{{ orden.fecha }}</td>
+                        <td>${{ orden.total }}</td>
+                        <td>PayPal</td>
+                        <td>{{ orden.get_estado_display }}</td>
+                        <td>
+                            {% if orden.verificado_por_contador %}
+                                <span class="badge bg-success">Sí</span>
+                            {% else %}
+                                <span class="badge bg-warning">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                          {% if not orden.verificado_por_contador %}
+                          <form method="post" action="{% url 'actualizar_estado_contador' orden.id %}">
+                              {% csrf_token %}
+                              <button type="submit" class="btn btn-success btn-sm">Marcar pago como verificado</button>
+                          </form>
+                          {% else %}
+                          <span class="badge bg-success">Pago verificado</span>
+                          {% endif %}
+                      </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No hay pagos pendientes.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

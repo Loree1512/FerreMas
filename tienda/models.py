@@ -46,6 +46,8 @@ class Orden(models.Model):
     sucursal = models.CharField(max_length=100, blank=True, null=True)
     paypal_payment_id = models.CharField(max_length=255, blank=True, null=True)
     fecha_pago = models.DateTimeField(blank=True, null=True)
+    verificado_por_contador = models.BooleanField(default=False)
+    ocultar_para_vendedor = models.BooleanField(default=False)
     ESTADOS = [
         ('pendiente', 'Pendiente'),
         ('preparando', 'Preparando'),
@@ -70,3 +72,4 @@ class ItemOrden(models.Model):
     def __str__(self):
         nombre_producto = self.producto.nombre if self.producto else 'Producto eliminado'
         return f'{nombre_producto} x {self.cantidad}'
+    

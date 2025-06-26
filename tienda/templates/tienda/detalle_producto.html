@@ -16,11 +16,6 @@
             <p class="text-muted mb-3">{{ producto.descripcion }}</p>
             <div class="mb-3">
                 <span class="badge bg-secondary">{{ producto.get_categoria_display }}</span>
-                {% if producto.disponible %}
-                    <span class="badge bg-success ms-2">Disponible</span>
-                {% else %}
-                    <span class="badge bg-danger ms-2">No disponible</span>
-                {% endif %}
             </div>
             <h3 class="text-success mb-4">Precio: ${{ producto.precio }}</h3>
             <p><strong>Stock disponible:</strong> {{ producto.stock }}</p>

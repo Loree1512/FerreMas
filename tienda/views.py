@@ -80,19 +80,12 @@ def limpiar_historial_bodeguero(request):
     messages.success(request, "Historial limpiado correctamente.")
     return redirect('bodeguero_inicio')
 
-@login_required
 def contador_inicio(request):
-    if request.user.perfil.rol != 'contador':
-        return redirect('inicio')
-
-    ordenes_pagadas = Orden.objects.filter(
-        estado='completado',
-        metodo_pago='paypal'  # o el valor que uses para identificar pagos PayPal
-    ).order_by('-fecha')
-
-    return render(request, 'tienda/contador/inicio.html', {
-        'ordenes': ordenes_pagadas
-    })
+    ordenes = Orden.objects.filter(
+        metodo_pago='paypal',
+        estado__in=['entregado_a_cliente', 'validado', 'completado']  # estados en los que quieres que aparezca
+    )
+    return render(request, 'tienda/contador/inicio.html', {'ordenes': ordenes})
 
 
 def checkout_view(request):
@@ -472,3 +465,37 @@ def actualizar_estado_vendedor(request, orden_id):
             messages.warning(request, 'Acción no permitida en el estado actual.')
 
     return redirect('admin_ordenes')  # O a la vista de vendedor
+
+@login_required
+def verificar_pago(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+    if request.method == 'POST':
+        orden.verificado_por_contador = True
+        orden.save()
+        messages.success(request, 'Pago verificado correctamente.')
+    return redirect('contador_inicio')
+
+def actualizar_estado_contador(request, orden_id):
+    orden = get_object_or_404(Orden, id=orden_id)
+
+    if request.method == 'POST':
+        orden.verificado_por_contador = True
+        # Opcional: Cambiar estado a 'validado' si quieres reflejarlo también
+        orden.estado = 'validado'
+        orden.save()
+        messages.success(request, f'Pago de la orden #{orden.id} marcado como verificado.')
+
+    return redirect('contador_inicio')
+
+def limpiar_historial_vendedor(request):
+    if request.method == "POST":
+        Orden.objects.filter(usuario=request.user).update(ocultar_para_vendedor=True)
+        messages.success(request, "Historial limpiado correctamente.")
+    return redirect('admin_ordenes')
+
+# Vista para limpiar historial del contador (por ejemplo borrar órdenes verificadas)
+def limpiar_historial_contador(request):
+    Orden.objects.filter(verificado_por_contador=True).delete()
+    messages.success(request, "Historial de pagos verificados eliminado correctamente.")
+    return redirect('contador_inicio')
+
